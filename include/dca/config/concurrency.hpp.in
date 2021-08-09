@@ -1,0 +1,19 @@
+// Copyright (C) 2018 ETH Zurich
+// Copyright (C) 2018 UT-Battelle, LLC
+// All rights reserved.
+//
+// See LICENSE for terms of usage.
+// See CITATION.md for citation guidelines, if DCA++ is used for scientific publications.
+//
+// Author: Urs R. Haehner (haehneru@itp.phys.ethz.ch)
+//
+// This is a CMake generated header file.
+// It defines the concurrency type and includes the corresponding header.
+
+#ifndef DCA_CONFIG_CONCURRENCY_HPP
+#define DCA_CONFIG_CONCURRENCY_HPP
+
+#include "@DCA_CONCURRENCY_INCLUDE@"
+using Concurrency = @DCA_CONCURRENCY_TYPE@;
+
+#endif  // DCA_CONFIG_CONCURRENCY_HPP

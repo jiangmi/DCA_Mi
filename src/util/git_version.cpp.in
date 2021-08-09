@@ -1,0 +1,41 @@
+// Copyright (C) 2018 ETH Zurich
+// Copyright (C) 2018 UT-Battelle, LLC
+// All rights reserved.
+//
+// See LICENSE for terms of usage.
+// See CITATION.md for citation guidelines, if DCA++ is used for scientific publications.
+//
+// Author: Urs R. Haehner (haehneru@itp.phys.ethz.ch)
+//
+// This file implements the GitVersion.
+
+#include "dca/util/git_version.hpp"
+#include <iostream>
+#include <string>
+
+namespace dca {
+namespace util {
+// dca::util::
+
+const std::string GitVersion::git_log = "@GIT_LOG@";
+const std::string GitVersion::git_status = "@GIT_STATUS@";
+
+void GitVersion::print() {
+  std::cout << "\n"
+            << "********************************************************************************\n"
+            << "**********                        Git Version                         **********\n"
+            << "********************************************************************************\n"
+            << "\n"
+            << "Last commit:\n"
+            << GitVersion::git_log << "\n"
+            << "Working tree:\n"
+            << GitVersion::git_status << std::endl;
+}
+
+std::string GitVersion::string() {
+  return std::string("Last commit:\n" + GitVersion::git_log + "\nWorking tree:\n" +
+                     GitVersion::git_status);
+}
+
+}  // util
+}  // dca

@@ -1,0 +1,8 @@
+{
+    "physics": {
+        "beta": 0.5,
+        "density": 0.9,
+        "chemical-potential": -0.4,
+        "adjust-chemical-potential": false
+    }
+}

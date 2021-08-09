@@ -1,0 +1,7 @@
+{
+    "SS-CT-HYB": {
+        "self-energy-tail-cutoff": 10,
+        "steps-per-sweep": 0.6,
+        "shifts-per-sweep": 0.4
+    }
+}

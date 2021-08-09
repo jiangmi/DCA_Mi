@@ -1,0 +1,5 @@
+{
+    "ED": {
+        "eigenvalue-cut-off": 1.e-4
+    }
+}

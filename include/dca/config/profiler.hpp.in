@@ -1,0 +1,24 @@
+// Copyright (C) 2018 ETH Zurich
+// Copyright (C) 2018 UT-Battelle, LLC
+// All rights reserved.
+//
+// See LICENSE for terms of usage.
+// See CITATION.md for citation guidelines, if DCA++ is used for scientific publications.
+//
+// Author: Urs R. Haehner (haehneru@itp.phys.ethz.ch)
+//
+// This is a CMake generated header file.
+// It defines the event and profiler types and includes the corresponding headers.
+
+#ifndef DCA_CONFIG_PROFILER_HPP
+#define DCA_CONFIG_PROFILER_HPP
+
+#include <cstdlib>
+
+#include "@DCA_PROFILING_EVENT_INCLUDE@"
+using Event = @DCA_PROFILING_EVENT_TYPE@;
+
+#include "@DCA_PROFILER_INCLUDE@"
+using Profiler = @DCA_PROFILER_TYPE@;
+
+#endif  // DCA_CONFIG_PROFILER_HPP

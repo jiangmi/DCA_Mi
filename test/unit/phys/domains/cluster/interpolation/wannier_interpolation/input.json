@@ -1,0 +1,28 @@
+{
+    "single-band-Hubbard-model": {
+        "t": 1.,
+        "t-prime": 0.5
+    },
+
+    "domains": {
+        "real-space-grids": {
+            "cluster": [[4, 2],
+                        [0, 4]],
+            "sp-host": [[8, 8],
+                        [8,-8]],
+            "tp-host": [[8, 8],
+                        [8,-8]]
+        },
+
+        "imaginary-time": {
+            "sp-time-intervals": 128,
+            "time-intervals-for-time-measurements": 16
+        },
+
+        "imaginary-frequency": {
+            "sp-fermionic-frequencies": 256,
+            "HTS-bosonic-frequencies": 32,
+            "four-point-fermionic-frequencies": 16
+        }
+    }
+}

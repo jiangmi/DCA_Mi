@@ -1,0 +1,19 @@
+// Copyright (C) 2018 ETH Zurich
+// Copyright (C) 2018 UT-Battelle, LLC
+// All rights reserved.
+//
+// See LICENSE for terms of usage.
+// See CITATION.md for citation guidelines, if DCA++ is used for scientific publications.
+//
+// Author: John Biddiscombe (john.biddiscombe@cscs.ch)
+//         Urs R. Haehner (haehneru@itp.phys.ethz.ch)
+//
+// This is a CMake generated header file.
+// It contains preprocessor definitions about the availability of libraries.
+
+#ifndef DCA_CONFIG_HAVES_DEFINES_HPP
+#define DCA_CONFIG_HAVES_DEFINES_HPP
+
+@dca_haves_defines@
+
+#endif  // DCA_CONFIG_HAVES_DEFINES_HPP

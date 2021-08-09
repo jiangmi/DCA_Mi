@@ -1,0 +1,155 @@
+{
+    "output": {
+        "directory": "./",
+        "output-format": "HDF5",
+        "filename-dca": "dca.hdf5",
+        "filename-analysis": "analysis.hdf5",
+        "filename-ed": "ed.hdf5",
+        "filename-qmc": "qmc.hdf5",
+        "filename-profiling": "profiling.json",
+        "directory-config-read" : "configuration",
+        "directory-config-write" : "configuration",
+        "dump-lattice-self-energy": false,
+        "dump-cluster-Greens-functions": false,
+        "dump-Gamma-lattice": false,
+        "dump-chi-0-lattice": false
+    },
+
+    "physics": {
+        "beta": 1.,
+        "density": 1.,
+        "chemical-potential": 0.,
+        "adjust-chemical-potential": true
+    },
+
+    "single-band-Hubbard-model": {
+        "t": 0.,
+        "t-prime": 0.,
+        "U": 0.,
+        "V": 0.,
+        "V-prime": 0.
+    },
+
+    "bilayer-Hubbard-model": {
+        "t": 0.,
+        "t-prime": 0.,
+        "t-perp": 0.,
+        "U": 0.,
+        "V": 0.,
+        "V-prime": 0.
+    },
+
+    "material-model": {
+        "t_ij-filename": "t_ij.txt",
+        "U_ij-filename": "U_ij.txt"
+    },
+
+    "DCA": {
+        "initial-self-energy": "zero",
+        "iterations": 1,
+        "accuracy": 0.,
+        "self-energy-mixing-factor": 1.,
+        "interacting-orbitals": [0],
+
+        "do-finite-size-QMC": false,
+
+        "coarse-graining": {
+            "k-mesh-recursion": 0,
+            "periods": 0,
+            "quadrature-rule": 1,
+            "threads": 1,
+            "tail-frequencies": 0
+        },
+
+        "DCA+": {
+            "do-DCA+": false,
+            "deconvolution-iterations": 16,
+            "deconvolution-tolerance": 1.e-3,
+            "HTS-approximation": false,
+            "HTS-threads": 1
+        }
+    },
+
+    "domains": {
+        "real-space-grids": {
+            "cluster": [[1, 0],
+                        [0, 1]],
+            "sp-host": [[1, 0],
+                        [0, 1]],
+            "tp-host": [[1, 0],
+                        [0, 1]]
+        },
+
+        "imaginary-time": {
+            "sp-time-intervals": 128,
+            "time-intervals-for-time-measurements": 1
+        },
+
+        "imaginary-frequency": {
+            "sp-fermionic-frequencies": 256,
+            "HTS-bosonic-frequencies": 0,
+            "four-point-fermionic-frequencies": 1
+        },
+
+        "real-frequency": {
+            "min": -10.,
+            "max": 10.,
+            "frequencies": 3,
+            "imaginary-damping": 0.01
+        }
+    },
+
+    "Monte-Carlo-integration": {
+        "seed": 985456376,
+        "warm-up-sweeps": 20,
+        "sweeps-per-measurement": 1.,
+        "measurements": 100,
+        "error-computation-type" : "NONE",
+        "store-configuration" : false,
+
+        "threaded-solver": {
+            "walkers": 1,
+            "accumulators": 1,
+            "shared-walk-and-accumulation-thread" : false,
+            "fix-meas-per-walker" : false
+        }
+    },
+
+    "CT-AUX": {
+        "expansion-parameter-K": 1.,
+        "initial-configuration-size": 10,
+        "initial-matrix-size": 128,
+        "max-submatrix-size": 128,
+        "neglect-Bennett-updates": false,
+        "additional-time-measurements": false
+    },
+
+    "SS-CT-HYB": {
+        "self-energy-tail-cutoff": 0,
+        "steps-per-sweep": 0.5,
+        "shifts-per-sweep": 0.5
+    },
+
+    "four-point": {
+        "channel": [],
+        "momentum-transfer": [0., 0.],
+        "frequency-transfer": 0,
+        "compute-all-transfers" : false
+    },
+
+    "analysis": {
+        "symmetrize-Gamma": true,
+        "Gamma-deconvolution-cut-off": 0.5,
+        "project-onto-crystal-harmonics": false,
+        "projection-cut-off-radius": 1.5
+    },
+
+    "ED": {
+        "eigenvalue-cut-off": 1.e-6
+    },
+
+    "double-counting": {
+        "method" : "none",
+        "correction" : 0.
+    }
+}

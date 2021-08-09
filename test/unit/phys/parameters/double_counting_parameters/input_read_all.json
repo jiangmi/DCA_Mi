@@ -1,0 +1,6 @@
+{
+    "double-counting": {
+        "method": "constant-correction-with-U-correction",
+        "correction": 4.2
+    }
+}

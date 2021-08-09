@@ -1,0 +1,69 @@
+// Copyright (C) 2018 ETH Zurich
+// Copyright (C) 2018 UT-Battelle, LLC
+// All rights reserved.
+//
+// See LICENSE for terms of usage.
+// See CITATION.md for citation guidelines, if DCA++ is used for scientific publications.
+//
+// Author: Urs R. Haehner (haehneru@itp.phys.ethz.ch)
+//
+// This file implements cmake_options.hpp.
+
+#include "dca/config/cmake_options.hpp"
+#include <iostream>
+
+namespace dca {
+namespace config {
+// dca::config::
+
+const std::string CMakeOptions::dca_with_cuda = "@DCA_WITH_CUDA@";
+const std::string CMakeOptions::cuda_gpu_arch = "@CUDA_GPU_ARCH@";
+const std::string CMakeOptions::dca_with_mpi = "@DCA_WITH_MPI@";
+const std::string CMakeOptions::dca_with_threaded_solver = "@DCA_WITH_THREADED_SOLVER@";
+const std::string CMakeOptions::dca_cluster_solver = "@DCA_CLUSTER_SOLVER@";
+const std::string CMakeOptions::dca_lattice = "@DCA_LATTICE@";
+const std::string CMakeOptions::dca_point_group = "@DCA_POINT_GROUP@";
+const std::string CMakeOptions::dca_model = "@DCA_MODEL@";
+const std::string CMakeOptions::dca_rng = "@DCA_RNG@";
+const std::string CMakeOptions::dca_profiler = "@DCA_PROFILER@";
+const std::string CMakeOptions::dca_with_autotuning = "@DCA_WITH_AUTOTUNING@";
+const std::string CMakeOptions::dca_with_gnuplot = "@DCA_WITH_GNUPLOT@";
+const std::string CMakeOptions::dca_with_single_precision_tp_measurements =
+    "@DCA_WITH_SINGLE_PRECISION_TP_MEASUREMENTS@";
+const std::string CMakeOptions::dca_with_qmc_bit = "@DCA_WITH_QMC_BIT@";
+const std::string CMakeOptions::dca_with_memory_savings = "@DCA_WITH_MEMORY_SAVINGS@";
+const std::string CMakeOptions::dca_with_managed_memory = "@DCA_WITH_MANAGED_MEMORY@";
+
+void CMakeOptions::print() {
+  std::cout << "\n"
+            << "********************************************************************************\n"
+            << "**********                       CMake Options                        **********\n"
+            << "********************************************************************************\n"
+            << "\n"
+            << "DCA_WITH_CUDA = " << CMakeOptions::dca_with_cuda << std::endl;
+
+  if (CMakeOptions::dca_with_cuda == "ON")
+    std::cout << "CUDA_GPU_ARCH = " << CMakeOptions::cuda_gpu_arch << std::endl;
+
+  std::cout << "\n"
+            << "DCA_WITH_MPI = " << CMakeOptions::dca_with_mpi << "\n"
+            << "DCA_WITH_THREADED_SOLVER = " << CMakeOptions::dca_with_threaded_solver << "\n"
+            << "\n"
+            << "DCA_CLUSTER_SOLVER = " << CMakeOptions::dca_cluster_solver << "\n"
+            << "DCA_LATTICE = " << CMakeOptions::dca_lattice << "\n"
+            << "DCA_POINT_GROUP = " << CMakeOptions::dca_point_group << "\n"
+            << "DCA_MODEL = " << CMakeOptions::dca_model << "\n"
+            << "DCA_RNG = " << CMakeOptions::dca_rng << "\n"
+            << "DCA_PROFILER = " << CMakeOptions::dca_profiler << "\n"
+            << "DCA_WITH_AUTOTUNING = " << CMakeOptions::dca_with_autotuning << "\n"
+            << "DCA_WITH_GNUPLOT = " << CMakeOptions::dca_with_gnuplot << "\n"
+            << "DCA_WITH_SINGLE_PRECISION_TP_MEASUREMENTS = "
+            << dca_with_single_precision_tp_measurements << "\n"
+            << "DCA_WITH_MEMORY_SAVINGS = " << CMakeOptions::dca_with_memory_savings << "\n"
+            << "DCA_WITH_MANAGED_MEMORY = " << CMakeOptions::dca_with_managed_memory << "\n"
+            << "\n"
+            << "DCA_WITH_QMC_BIT = " << CMakeOptions::dca_with_qmc_bit << "\n"
+            << std::endl;
+}
+}  // namespace config
+}  // namespace dca

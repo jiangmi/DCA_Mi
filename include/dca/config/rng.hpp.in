@@ -1,0 +1,19 @@
+// Copyright (C) 2018 ETH Zurich
+// Copyright (C) 2018 UT-Battelle, LLC
+// All rights reserved.
+//
+// See LICENSE for terms of usage.
+// See CITATION.md for citation guidelines, if DCA++ is used for scientific publications.
+//
+// Author: Urs R. Haehner (haehneru@itp.phys.ethz.ch)
+//
+// This is a CMake generated header file.
+// It defines the random number generator type and includes the corresponding header.
+
+#ifndef DCA_CONFIG_RNG_HPP
+#define DCA_CONFIG_RNG_HPP
+
+#include "@DCA_RNG_INCLUDE@"
+using RandomNumberGenerator = @DCA_RNG_TYPE@;
+
+#endif  // DCA_CONFIG_RNG_HPP
