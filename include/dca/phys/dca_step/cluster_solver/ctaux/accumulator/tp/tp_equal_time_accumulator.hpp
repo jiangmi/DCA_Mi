@@ -51,6 +51,7 @@ public:
 
   using t = func::dmn_0<domains::time_domain>;
   using t_VERTEX = func::dmn_0<domains::vertex_time_domain<domains::TP_TIME_DOMAIN_POSITIVE>>;
+  using t_sp     = func::dmn_0<domains::vertex_time_domain<domains::SP_TIME_DOMAIN_POSITIVE>>;
 
   using b = func::dmn_0<domains::electron_band_domain>;
   using s = func::dmn_0<domains::electron_spin_domain>;
@@ -92,6 +93,15 @@ public:
   func::function<double, func::dmn_variadic<b, r_dmn_t>>& get_magnetic_cluster_moment() {
     return magnetic_cluster_moment;
   }
+  func::function<double, func::dmn_variadic<b, b, r_dmn_t, t_sp>>& get_spin_XX_chi() {
+    return spin_XX_chi;
+  }
+  func::function<double, func::dmn_variadic<b, b, r_dmn_t, t_sp>>& get_spin_ZZ_chi() {
+    return spin_ZZ_chi;
+  }
+  func::function<double, func::dmn_variadic<b, b, r_dmn_t, t_sp>>& get_charge_chi() {
+    return charge_chi;
+  }
   func::function<double, func::dmn_variadic<b, r_dmn_t>>& get_dwave_pp_correlator() {
     return dwave_pp_correlator;
   }
@@ -105,6 +115,8 @@ public:
   void accumulate_G_r_t(double sign);
 
   void accumulate_moments(double sign);
+
+  void accumulate_chi(double sign);
 
   void accumulate_dwave_pp_correlator(double sign);
 
@@ -127,7 +139,10 @@ private:
   void test_G0_original();
 
   void interpolate(func::function<double, func::dmn_variadic<nu, nu, r_dmn_t, t>>& G_r_t,
-                   func::function<double, func::dmn_variadic<nu, nu, r_dmn_t, t>>& G_r_t_stddev);
+                   func::function<double, func::dmn_variadic<nu, nu, r_dmn_t, t>>& G_r_t_stddev,
+                   func::function<double, func::dmn_variadic<b, b, r_dmn_t, t_sp>>& spin_XX_chi,
+                   func::function<double, func::dmn_variadic<b, b, r_dmn_t, t_sp>>& spin_ZZ_chi,
+                   func::function<double, func::dmn_variadic<b, b, r_dmn_t, t_sp>>& charge_chi);
 
   int find_first_non_interacting_spin(const std::vector<vertex_singleton_type>& configuration_e_spin);
 
@@ -228,6 +243,13 @@ private:
   func::function<double, func::dmn_variadic<b, r_dmn_t>> charge_cluster_moment;
   func::function<double, func::dmn_variadic<b, r_dmn_t>> magnetic_cluster_moment;
 
+  func::function<double, func::dmn_variadic<b, b, r_dmn_t, t_sp>> spin_XX_chi;
+  func::function<double, func::dmn_variadic<b, b, r_dmn_t, t_sp>> spin_ZZ_chi;
+  func::function<double, func::dmn_variadic<b, b, r_dmn_t, t_sp>> charge_chi;
+  func::function<double, func::dmn_variadic<b, b, r_dmn_t, t_VERTEX>> spin_XX_chi_accumulated;
+  func::function<double, func::dmn_variadic<b, b, r_dmn_t, t_VERTEX>> spin_ZZ_chi_accumulated;
+  func::function<double, func::dmn_variadic<b, b, r_dmn_t, t_VERTEX>> charge_chi_accumulated;
+
   func::function<double, k_dmn_t> dwave_k_factor;
   func::function<double, r_dmn_t> dwave_r_factor;
 
@@ -251,6 +273,12 @@ TpEqualTimeAccumulator<parameters_type, MOMS_type>::TpEqualTimeAccumulator(
 
       charge_cluster_moment("charge-cluster-moment"),
       magnetic_cluster_moment("magnetic-cluster-moment"),
+      spin_XX_chi("spin-XX-susceptibility"),
+      spin_ZZ_chi("spin-ZZ-susceptibility"),
+      charge_chi("charge-susceptibility"),
+      spin_XX_chi_accumulated("spin-XX-susceptibility_accumulated"),
+      spin_ZZ_chi_accumulated("spin-ZZ-susceptibility_accumulated"),
+      charge_chi_accumulated("charge-susceptibility_accumulated"),
 
       dwave_pp_correlator("dwave-pp-correlator") {
   for (int k_ind = 0; k_ind < k_dmn_t::dmn_size(); k_ind++)
@@ -287,6 +315,13 @@ void TpEqualTimeAccumulator<parameters_type, MOMS_type>::resetAccumulation() {
 
   charge_cluster_moment = 0;
   magnetic_cluster_moment = 0;
+
+  spin_XX_chi = 0;
+  spin_ZZ_chi = 0;
+  charge_chi = 0;
+  spin_XX_chi_accumulated = 0;
+  spin_ZZ_chi_accumulated = 0;
+  charge_chi_accumulated = 0;
 
   dwave_pp_correlator = 0;
 }
@@ -499,7 +534,7 @@ void TpEqualTimeAccumulator<parameters_type, MOMS_type>::test_G0_original() {
 
   util::Plot::plotLinesPoints(G_r_t_accumulated);
 
-  interpolate(G_r_t, G_r_t_stddev);
+  interpolate(G_r_t, G_r_t_stddev, spin_XX_chi, spin_ZZ_chi, charge_chi);
 
   util::Plot::plotLinesPoints(G_r_t);
 
@@ -516,7 +551,7 @@ void TpEqualTimeAccumulator<parameters_type, MOMS_type>::finalize() {
     G_r_t_accumulated_squared(l) =
         std::sqrt(std::abs(G_r_t_accumulated_squared(l) - std::pow(G_r_t_accumulated(l), 2)));
 
-  interpolate(G_r_t, G_r_t_stddev);
+  interpolate(G_r_t, G_r_t_stddev, spin_XX_chi, spin_ZZ_chi, charge_chi);
 
   // util::Plot::plotLinesPoints(G_r_t);
 }
@@ -524,7 +559,10 @@ void TpEqualTimeAccumulator<parameters_type, MOMS_type>::finalize() {
 template <class parameters_type, class MOMS_type>
 void TpEqualTimeAccumulator<parameters_type, MOMS_type>::interpolate(
     func::function<double, func::dmn_variadic<nu, nu, r_dmn_t, t>>& G_r_t,
-    func::function<double, func::dmn_variadic<nu, nu, r_dmn_t, t>>& G_r_t_stddev) {
+    func::function<double, func::dmn_variadic<nu, nu, r_dmn_t, t>>& G_r_t_stddev,
+    func::function<double, func::dmn_variadic<b, b, r_dmn_t, t_sp>>& spin_XX_chi,
+    func::function<double, func::dmn_variadic<b, b, r_dmn_t, t_sp>>& spin_ZZ_chi,
+    func::function<double, func::dmn_variadic<b, b, r_dmn_t, t_sp>>& charge_chi) {
   int size = t_VERTEX::dmn_size();
 
   math::interpolation::akima_interpolation<double> ai_obj(size);
@@ -576,6 +614,54 @@ void TpEqualTimeAccumulator<parameters_type, MOMS_type>::interpolate(
           for (int t_ind = 0; t_ind < t::dmn_size() / 2; t_ind++)
             G_r_t_stddev(nu0_ind, nu1_ind, r_ind, t_ind) =
                 G_r_t_stddev(nu0_ind, nu1_ind, r_ind, t_ind + t::dmn_size() / 2);
+
+    for(int b_j=0; b_j<b::dmn_size(); b_j++){
+      for(int b_i=0; b_i<b::dmn_size(); b_i++){
+        for(int r_ind=0; r_ind<r_dmn_t::dmn_size(); r_ind++){
+          for(int t_ind=0; t_ind<t_VERTEX::dmn_size(); t_ind++){
+
+            y[t_ind] = spin_XX_chi_accumulated(b_i, b_j, r_ind, t_ind);
+
+            ai_obj.initialize(x, y);
+
+            for(int t_ind=0; t_ind<t_sp::dmn_size(); t_ind++)
+              spin_XX_chi(b_i, b_j, r_ind, t_ind) = ai_obj.evaluate(t_sp::get_elements()[t_ind]);
+          }
+        }
+      }
+    }
+
+    for(int b_j=0; b_j<b::dmn_size(); b_j++){
+      for(int b_i=0; b_i<b::dmn_size(); b_i++){
+        for(int r_ind=0; r_ind<r_dmn_t::dmn_size(); r_ind++){
+          for(int t_ind=0; t_ind<t_VERTEX::dmn_size(); t_ind++){
+
+            y[t_ind] = spin_ZZ_chi_accumulated(b_i, b_j, r_ind, t_ind);
+
+            ai_obj.initialize(x, y);
+
+            for(int t_ind=0; t_ind<t_sp::dmn_size(); t_ind++)
+              spin_ZZ_chi(b_i, b_j, r_ind, t_ind) = ai_obj.evaluate(t_sp::get_elements()[t_ind]);
+          }
+        }
+      }
+    }
+
+    for(int b_j=0; b_j<b::dmn_size(); b_j++){
+      for(int b_i=0; b_i<b::dmn_size(); b_i++){
+        for(int r_ind=0; r_ind<r_dmn_t::dmn_size(); r_ind++){
+          for(int t_ind=0; t_ind<t_VERTEX::dmn_size(); t_ind++){
+
+            y[t_ind] = charge_chi_accumulated(b_i, b_j, r_ind, t_ind);
+
+            ai_obj.initialize(x, y);
+
+            for(int t_ind=0; t_ind<t_sp::dmn_size(); t_ind++)
+              charge_chi(b_i, b_j, r_ind, t_ind) = ai_obj.evaluate(t_sp::get_elements()[t_ind]);
+          }
+        }
+      }
+    }
   }
 
   delete[] x;
@@ -698,7 +784,88 @@ void TpEqualTimeAccumulator<parameters_type, MOMS_type>::accumulate_moments(doub
   }
 }
 
-/*!
+/*
+ *  spin_XX_Chi(r-r',tau-tau') = 1/2 * <S+(r,t)S-(r',t') + S-(r',t')S+(r,t)>  (this symmetrized form to average over the spin)
+ *                             = - G_up(r-r',tau-tau') * G_down(r'-r,tau'-tau) -G_up(r'-r,tau-tau') * G_down(r-r',tau'-tau)
+ *  spin_ZZ_Chi is almost the same as charge_Chi, except two sign change as below
+ *  charge_Chi(r-r',tau-tau') = sum_s,s' <n(r,t,s)n(r',t',s')>
+
+ *  Note there are (no) disconnected diagrams for charge(spin)_chi
+ *  Chi(0,0) needs correction due to cc+ = 1-c+c
+ *  Further FT to chi(q,iv) can be done by an external python script, although this way we do not have errorbar
+
+ *  Note that below we use Chi(t) ~ Gdn(i,j)*Gup(j,i) instead of -Gdn(i,j)*Gup(j,i) for positive Chi values
+ *  since G(t>0)<0 and G(t<0)>0
+ *  charge(spin)_susceptibility_accumulated will be interpolated to sp time_intervals
+ */
+template<class parameters_type, class MOMS_type>
+void TpEqualTimeAccumulator<parameters_type, MOMS_type>::accumulate_chi(double sign){
+
+  int b_i, b_j, r_i, r_j, t_i, t_j, dr, dt;
+  double upup, updn;
+  double sfactor = 0.5*sign/((t_VERTEX::dmn_size()-1)*r_dmn_t::dmn_size());
+  double cfactor = 2*sfactor;
+
+  for(int j=0; j<b_r_t_VERTEX_dmn_t::dmn_size(); j++){
+    b_j = fixed_configuration[j].b_ind;
+    r_j = fixed_configuration[j].r_ind;
+    t_j = fixed_configuration[j].t_ind;
+
+    for(int i=0; i<b_r_t_VERTEX_dmn_t::dmn_size(); i++){
+      b_i = fixed_configuration[i].b_ind;
+      r_i = fixed_configuration[i].r_ind;
+      t_i = fixed_configuration[i].t_ind;
+
+      dr = RClusterDmn::parameter_type::subtract(r_j, r_i);
+      dt = t_i-t_j;
+
+      // chi(beta) considered seperately later
+      if(t_i != t_VERTEX::dmn_size()-1 && t_j != t_VERTEX::dmn_size()-1)
+      {
+        dt = dt<0 ? dt+t_VERTEX::dmn_size()-1 : dt;
+
+        // connected diagrams:
+        // chi(0) ~ Gdn(0+)*Gup(0-) while Gup(0-) still has positive sign from G0_sign_up(i,j), so change sign here
+        upup = G_r_t_up(i,j)*G_r_t_up(j,i) + G_r_t_dn(i,j)*G_r_t_dn(j,i);
+        updn = G_r_t_dn(i,j)*G_r_t_up(j,i) + G_r_t_up(i,j)*G_r_t_dn(j,i);
+
+        if(dt==0){
+          spin_XX_chi_accumulated(b_i,b_j,dr,dt) -= sfactor* updn;
+          spin_ZZ_chi_accumulated(b_i,b_j,dr,dt) -= sfactor* upup;
+          charge_chi_accumulated (b_i,b_j,dr,dt) -= cfactor* upup;
+        }
+        else{
+          spin_XX_chi_accumulated(b_i,b_j,dr,dt) += sfactor* updn;
+          spin_ZZ_chi_accumulated(b_i,b_j,dr,dt) += sfactor* upup;
+          charge_chi_accumulated (b_i,b_j,dr,dt) += cfactor* upup;
+        }
+
+        // disconnected diagrams:
+        // note that (1-G_sigma)(1-G_sigma') switch to (1+G_sigma)(1+G_sigma') since G(dt=0)<0 needs changing sign
+        upup = (1.0+G_r_t_up(i,i))*(1.0+G_r_t_up(j,j)) + (1.0+G_r_t_dn(i,i))*(1.0+G_r_t_dn(j,j));
+        updn = (1.0+G_r_t_up(i,i))*(1.0+G_r_t_dn(j,j)) + (1.0+G_r_t_dn(i,i))*(1.0+G_r_t_up(j,j));
+ 
+        spin_ZZ_chi_accumulated(b_i,b_j,dr,dt) += sfactor* (upup - updn);
+        charge_chi_accumulated (b_i,b_j,dr,dt) += cfactor* (upup + updn);
+
+        // correction due to cc+ = 1=c+c
+        updn = G_r_t_up(j,j) + G_r_t_dn(j,j);
+        if(b_i==b_j && dr==0 && dt==0){
+          spin_XX_chi_accumulated(b_i,b_j,0,0) -= sfactor* updn;
+          spin_ZZ_chi_accumulated(b_i,b_j,0,0) -= sfactor* updn;
+          charge_chi_accumulated (b_i,b_j,0,0) -= cfactor* updn;
+        }
+      }
+ 
+      // chi(beta) = chi(0)
+      spin_XX_chi_accumulated(b_i,b_j,dr,t_VERTEX::dmn_size()-1) = spin_XX_chi_accumulated(b_i,b_j,dr,0);
+      spin_ZZ_chi_accumulated(b_i,b_j,dr,t_VERTEX::dmn_size()-1) = spin_ZZ_chi_accumulated(b_i,b_j,dr,0);
+      charge_chi_accumulated (b_i,b_j,dr,t_VERTEX::dmn_size()-1) = charge_chi_accumulated (b_i,b_j,dr,0);
+    }
+  }
+}
+
+/*
  * P_d
  */
 template <class parameters_type, class MOMS_type>
@@ -709,8 +876,8 @@ void TpEqualTimeAccumulator<parameters_type, MOMS_type>::accumulate_dwave_pp_cor
   for (int r_i = 0; r_i < r_dmn_t::dmn_size(); r_i++) {
     for (int r_j = 0; r_j < r_dmn_t::dmn_size(); r_j++) {
       for (int r_l = 0; r_l < r_dmn_t::dmn_size(); r_l++) {
-        int l_minus_i = r_dmn_t::parameter_type::subtract(r_i, r_l);
-        int l_minus_j = r_dmn_t::parameter_type::subtract(r_j, r_l);
+        int l_minus_i = RClusterDmn::parameter_type::subtract(r_i, r_l);
+        int l_minus_j = RClusterDmn::parameter_type::subtract(r_j, r_l);
 
         double struct_factor = dwave_r_factor(l_minus_i) * dwave_r_factor(l_minus_j);
 
@@ -910,6 +1077,8 @@ void TpEqualTimeAccumulator<parameters_type, MOMS_type>::accumulateAll(
 
   accumulate_moments(sign);
 
+  accumulate_chi(sign);
+
   accumulate_dwave_pp_correlator(sign);
 }
 
@@ -920,6 +1089,9 @@ void TpEqualTimeAccumulator<parameters_type, MOMS_type>::sumTo(
   other.G_r_t_accumulated_squared += G_r_t_accumulated_squared;
   other.charge_cluster_moment += charge_cluster_moment;
   other.magnetic_cluster_moment += magnetic_cluster_moment;
+  other.spin_XX_chi += spin_XX_chi;
+  other.spin_ZZ_chi += spin_ZZ_chi;
+  other.charge_chi += charge_chi;
   other.dwave_pp_correlator += dwave_pp_correlator;
   other.GFLOP += GFLOP;
 }

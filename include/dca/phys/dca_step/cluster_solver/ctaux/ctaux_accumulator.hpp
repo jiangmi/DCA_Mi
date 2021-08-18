@@ -63,6 +63,7 @@ public:
   typedef vertex_singleton vertex_singleton_type;
 
   using t = func::dmn_0<domains::time_domain>;
+  using t_sp = func::dmn_0<domains::vertex_time_domain<domains::SP_TIME_DOMAIN_POSITIVE>>;
   using w = func::dmn_0<domains::frequency_domain>;
   using w_VERTEX = func::dmn_0<domains::vertex_frequency_domain<domains::COMPACT>>;
 
@@ -124,6 +125,15 @@ public:
   }
   func::function<double, func::dmn_variadic<b, r_dmn_t>>& get_magnetic_cluster_moment() {
     return equal_time_accumulator_.get_magnetic_cluster_moment();
+  }
+  func::function<double, func::dmn_variadic<b, b, r_dmn_t, t_sp>>& get_spin_XX_chi() {
+    return equal_time_accumulator_.get_spin_XX_chi();
+  }
+  func::function<double, func::dmn_variadic<b, b, r_dmn_t, t_sp>>& get_spin_ZZ_chi() {
+    return equal_time_accumulator_.get_spin_ZZ_chi();
+  }
+  func::function<double, func::dmn_variadic<b, b, r_dmn_t, t_sp>>& get_charge_chi() {
+    return equal_time_accumulator_.get_charge_chi();
   }
   func::function<double, func::dmn_variadic<b, r_dmn_t>>& get_dwave_pp_correlator() {
     return equal_time_accumulator_.get_dwave_pp_correlator();
@@ -312,6 +322,9 @@ void CtauxAccumulator<device_t, Parameters, Data>::write(Writer& writer) {
 //    writer.execute(get_G_r_t_stddev());
     writer.execute(get_charge_cluster_moment());
     writer.execute(get_magnetic_cluster_moment());
+    writer.execute(get_spin_XX_chi());
+    writer.execute(get_spin_ZZ_chi());
+    writer.execute(get_charge_chi());
     writer.execute(get_dwave_pp_correlator());
   }
 
