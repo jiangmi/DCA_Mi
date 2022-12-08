@@ -225,7 +225,7 @@ void bilayer_lattice<point_group_type>::initialize_H_0(
         e1 -2. * t1 * (std::cos(k[0]) + std::cos(k[1])) - 4. * t1_prime * std::cos(k[0]) * std::cos(k[1]);
     const auto val2 =
         e2 -2. * t2 * (std::cos(k[0]) + std::cos(k[1])) - 4. * t2_prime * std::cos(k[0]) * std::cos(k[1]);
-    const auto val3 = -t_perp -2. * t_perp_prime * (std::cos(k[0]) - std::cos(k[1]));
+    const auto val3 = -t_perp -2. * t_perp_prime * (std::cos(k[0]) + std::cos(k[1]));
 
     H_0(0, 0, 0, 0, k_ind) = val1;
     H_0(0, 1, 0, 1, k_ind) = val1;
