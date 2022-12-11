@@ -20,6 +20,7 @@
 #include <string>
 
 #include "dca/phys/models/analytic_hamiltonians/bilayer_lattice.hpp"
+#include "dca/phys/models/analytic_hamiltonians/trilayer_lattice.hpp"
 #include "dca/phys/models/analytic_hamiltonians/dsmodel_lattice.hpp"
 #include "dca/phys/models/analytic_hamiltonians/twoband_chain.hpp"
 #include "dca/phys/models/analytic_hamiltonians/singleband_chain.hpp"
@@ -46,6 +47,9 @@ class ModelParameters {};
 
 // Specialization for square lattice bilayer Hubbard model
 #include "model_parameters_bilayer_hubbard.inc"
+
+// Specialization for square lattice trilayer Hubbard model
+#include "model_parameters_trilayer_hubbard.inc"
 
 // Specialization for square lattice ds model
 #include "model_parameters_dsmodel.inc"
