@@ -455,6 +455,19 @@ void symmetrize_single_particle_function::executeTimeOrFreq(
             scalartype tmp_7 = f(b1, b0, opposite_idx, w_0 - w_ind);
 
             if (Cluster::REPRESENTATION == domains::MOMENTUM_SPACE) {
+
+               if ((b0 == 0 && b1 != b0)||(b1 == 0 && b1 != b0)) {
+                   scalartype tmp = (tmp_0 + tmp_1 - std::conj(tmp_2) - std::conj(tmp_3) - (tmp_4 + tmp_5 - std::conj(tmp_6) - std::conj(tmp_7))) / 8.;
+                   f_new(b0, b1, c_ind, w_ind) = tmp;
+                   f_new(b0, b1, opposite_idx, w_ind) = tmp;
+                   f_new(b0, b1, c_ind, w_0 - w_ind) = - 1.0 *std::conj(tmp);
+                   f_new(b0, b1, opposite_idx, w_0 - w_ind) = - 1.0 * std::conj(tmp);
+                   f_new(b1, b0, c_ind, w_ind) = - 1.0 * tmp;
+                   f_new(b1, b0, opposite_idx, w_ind) = - 1.0 * tmp;
+                   f_new(b1, b0, c_ind, w_0 - w_ind) = std::conj(tmp);
+                   f_new(b1, b0, opposite_idx, w_0 - w_ind) =  std::conj(tmp);
+                   }
+                else {
                    scalartype tmp = (tmp_0 + tmp_1 + std::conj(tmp_2) + std::conj(tmp_3) + (tmp_4 + tmp_5 + std::conj(tmp_6) + std::conj(tmp_7))) / 8.;
                    f_new(b0, b1, c_ind, w_ind) = tmp;
                    f_new(b0, b1, opposite_idx, w_ind) = tmp;
@@ -464,6 +477,7 @@ void symmetrize_single_particle_function::executeTimeOrFreq(
                    f_new(b1, b0, opposite_idx, w_ind) = tmp;
                    f_new(b1, b0, c_ind, w_0 - w_ind) = std::conj(tmp);
                    f_new(b1, b0, opposite_idx, w_0 - w_ind) = std::conj(tmp);
+                 }
                }
             else if (Cluster::REPRESENTATION == domains::REAL_SPACE) {
                 scalartype tmp = (tmp_0 + std::conj(tmp_7)) / 2.;
