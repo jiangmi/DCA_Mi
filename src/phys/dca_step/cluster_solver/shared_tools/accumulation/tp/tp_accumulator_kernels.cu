@@ -456,8 +456,11 @@ __global__ void updateG4Kernel(CudaComplex<Real>* __restrict__ G4,
       const bool conj_a = g4_helper.extendGIndices(k1_a, k2_a, w1_a, w2_a);
       const int i_a = b1 + nb * k1_a + no * w1_a;
       const int j_a = b3 + nb * k2_a + no * w2_a;
-
-      if ((conj_a == 1)&&((b1 == 0 && b1 != b3) || (b3 == 0 && b1 != b3))) {sign = -1.0;}
+      
+      if ((conj_a == 1) && ( (b0==0 && b3==1) || (b0==1 && b3==0) || (b0==0 && b3==2)||(b0==2 && b3==0)
+                          || (b0==3 && b3==1) || (b0==1 && b3==3) || (b0==3 && b3==2)||(b0==2 && b3==3)
+                          || (b0==4 && b3==1) || (b0==1 && b3==4) || (b0==4 && b3==2)||(b0==2 && b3==4))) 
+           {sign = -1.0;}
       else {sign = 1.0;}
 
       const CudaComplex<Real> Ga_1 = sign * cond_conj(G_up[i_a + ldgu * j_a], conj_a);
@@ -471,13 +474,19 @@ __global__ void updateG4Kernel(CudaComplex<Real>* __restrict__ G4,
       const int i_b = b2 + nb * k1_b + no * w1_b;
       const int j_b = b4 + nb * k2_b + no * w2_b;
 
-      if ((conj_b == 1)&&((b2 == 0 && b2 != b4) || (b4 == 0 && b2 != b4))) {sign = -1.0;}
+      if ((conj_b == 1) && ( (b2==0 && b4==1) || (b2==1 && b4==0) || (b2==0 && b4==2)||(b2==2 && b4==0)
+                          || (b2==3 && b4==1) || (b2==1 && b4==3) || (b2==3 && b4==2)||(b2==2 && b4==3)
+                          || (b2==4 && b4==1) || (b2==1 && b4==4) || (b2==4 && b4==2)||(b2==2 && b4==4)))
+           {sign = -1.0;}
       else {sign = 1.0;}
 
       const CudaComplex<Real> Gb_1 = sign * cond_conj(G_down[i_b + ldgd * j_b], conj_b);
       const CudaComplex<Real> Gb_2 = sign * cond_conj(G_up[i_b + ldgu * j_b], conj_b);
 
-      if ((b2 == 0 && b2 != b4) || (b4 == 0 && b2 != b4)) {
+
+      if ((b2==0 && b4==1) || (b2==1 && b4==0) || (b2==0 && b4==2)||(b2==2 && b4==0)
+       || (b2==3 && b4==1) || (b2==1 && b4==3) || (b2==3 && b4==2)||(b2==2 && b4==3)
+       || (b2==4 && b4==1) || (b2==1 && b4==4) || (b2==4 && b4==2)||(b2==2 && b4==4)) {
           contribution = -(Ga_1 * Gb_1 + Ga_2 * Gb_2);}
       else{
           contribution = (Ga_1 * Gb_1 + Ga_2 * Gb_2); }
