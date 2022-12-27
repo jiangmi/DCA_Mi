@@ -27,9 +27,7 @@ void GitVersion::print() {
             << "********************************************************************************\n"
             << "\n"
             << "Last commit:\n"
-            << GitVersion::git_log << "\n"
-            << "Working tree:\n"
-            << GitVersion::git_status << std::endl;
+            << GitVersion::git_log << std::endl;
 }
 
 std::string GitVersion::string() {
