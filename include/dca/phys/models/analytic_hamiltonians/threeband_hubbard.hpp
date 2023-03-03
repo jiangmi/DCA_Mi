@@ -208,7 +208,8 @@ void threeband_hubbard<point_group_type>::initialize_H_0(
   const auto t_pd = parameters.get_t_pd();
   const auto t_pp = parameters.get_t_pp();
   const auto ep_d = parameters.get_ep_d();
-  const auto ep_p = parameters.get_ep_p();
+  const auto ep_px = parameters.get_ep_px();
+  const auto ep_py = parameters.get_ep_py();
 
   H_0 = ScalarType(0);
 
@@ -222,8 +223,8 @@ void threeband_hubbard<point_group_type>::initialize_H_0(
 
     for (int s = 0; s < 2; s++) {
       H_0(0, s, 0, s, k_ind) = ep_d;
-      H_0(1, s, 1, s, k_ind) = ep_p;
-      H_0(2, s, 2, s, k_ind) = ep_p;
+      H_0(1, s, 1, s, k_ind) = ep_px;
+      H_0(2, s, 2, s, k_ind) = ep_py;
 
       H_0(0, s, 1, s, k_ind) = valdpx;
       H_0(1, s, 0, s, k_ind) = -valdpx;

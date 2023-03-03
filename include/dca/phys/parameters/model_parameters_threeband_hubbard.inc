@@ -46,11 +46,18 @@ public:
     ep_d_ = ep_d;
   }
 
-  double get_ep_p() const {
-    return ep_p_;
+  double get_ep_px() const {
+    return ep_px_;
   }
-  void set_ep_p(const double ep_p) {
-    ep_p_ = ep_p;
+  void set_ep_px(const double ep_px) {
+    ep_px_ = ep_px;
+  }
+
+  double get_ep_py() const {
+    return ep_py_;
+  }
+  void set_ep_py(const double ep_py) {
+    ep_py_ = ep_py;
   }
 
   double get_U_dd() const {
@@ -70,7 +77,8 @@ public:
 private:
   double t_pd_ = 0;
   double t_pp_ = 0;
-  double ep_p_ = 0;
+  double ep_px_ = 0;
+  double ep_py_ = 0;
   double ep_d_ = 0;
   double U_dd_ = 0;
   double U_pp_ = 0;
@@ -84,7 +92,8 @@ int ModelParameters<models::TightBindingModel<models::threeband_hubbard<PointGro
 
   buffer_size += concurrency.get_buffer_size(t_pd_);
   buffer_size += concurrency.get_buffer_size(t_pp_);
-  buffer_size += concurrency.get_buffer_size(ep_p_);
+  buffer_size += concurrency.get_buffer_size(ep_px_);
+  buffer_size += concurrency.get_buffer_size(ep_py_);
   buffer_size += concurrency.get_buffer_size(ep_d_);
   buffer_size += concurrency.get_buffer_size(U_dd_);
   buffer_size += concurrency.get_buffer_size(U_pp_);
@@ -98,7 +107,8 @@ void ModelParameters<models::TightBindingModel<models::threeband_hubbard<PointGr
     const Concurrency& concurrency, char* buffer, int buffer_size, int& position) const {
   concurrency.pack(buffer, buffer_size, position, t_pd_);
   concurrency.pack(buffer, buffer_size, position, t_pp_);
-  concurrency.pack(buffer, buffer_size, position, ep_p_);
+  concurrency.pack(buffer, buffer_size, position, ep_px_);
+  concurrency.pack(buffer, buffer_size, position, ep_py_);
   concurrency.pack(buffer, buffer_size, position, ep_d_);
   concurrency.pack(buffer, buffer_size, position, U_dd_);
   concurrency.pack(buffer, buffer_size, position, U_pp_);
@@ -110,7 +120,8 @@ void ModelParameters<models::TightBindingModel<models::threeband_hubbard<PointGr
     const Concurrency& concurrency, char* buffer, int buffer_size, int& position) {
   concurrency.unpack(buffer, buffer_size, position, t_pd_);
   concurrency.unpack(buffer, buffer_size, position, t_pp_);
-  concurrency.unpack(buffer, buffer_size, position, ep_p_);
+  concurrency.unpack(buffer, buffer_size, position, ep_px_);
+  concurrency.unpack(buffer, buffer_size, position, ep_py_);
   concurrency.unpack(buffer, buffer_size, position, ep_d_);
   concurrency.unpack(buffer, buffer_size, position, U_dd_);
   concurrency.unpack(buffer, buffer_size, position, U_pp_);
@@ -139,7 +150,12 @@ void ModelParameters<models::TightBindingModel<models::threeband_hubbard<PointGr
     catch (const std::exception& r_e) {
     }
     try {
-      reader_or_writer.execute("ep_p", ep_p_);
+      reader_or_writer.execute("ep_px", ep_px_);
+    }
+    catch (const std::exception& r_e) {
+    }
+    try {
+      reader_or_writer.execute("ep_py", ep_py_);
     }
     catch (const std::exception& r_e) {
     }
