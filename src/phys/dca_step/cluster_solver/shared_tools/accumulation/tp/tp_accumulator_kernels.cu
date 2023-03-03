@@ -295,6 +295,7 @@ __global__ void updateG4Kernel(CudaComplex<Real>* __restrict__ G4,
       // new scope to reuse local index variables
       {
         // contribution += (\sum_s s * G(k1, k1 + k_ex)) * (\sum_s s * G(k2 + k_ex, k2))
+        float sign;
         int w1_a(w1);
         int w2_a(g4_helper.addWex(w1, w_ex));
         int k1_a = k1;
