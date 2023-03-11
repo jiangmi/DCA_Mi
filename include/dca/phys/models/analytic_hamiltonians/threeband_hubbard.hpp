@@ -20,6 +20,7 @@
 #include "dca/function/domains.hpp"
 #include "dca/function/function.hpp"
 #include "dca/phys/domains/cluster/symmetries/point_groups/no_symmetry.hpp"
+#include "dca/phys/models/analytic_hamiltonians/util.hpp"
 #include "dca/phys/models/analytic_hamiltonians/cluster_shape_type.hpp"
 #include "dca/util/type_list.hpp"
 
@@ -156,26 +157,30 @@ void threeband_hubbard<point_group_type>::initialize_H_interaction(
   if (SpinDmn::dmn_size() != 2)
     throw std::logic_error("Spin domain size must be 2.");
 
-  const int origin = RDmn::parameter_type::origin_index();
+  const std::vector<typename RDmn::parameter_type::element_type>& basis =
+      RDmn::parameter_type::get_basis_vectors();
 
-  const double U_dd = parameters.get_U_dd();  // interaction in d band
-  const double U_pp = parameters.get_U_pp();  // interaction in p bands
+  assert(basis.size() == 2);
 
-  H_interaction = 0.;
+  //std::cout << "\t Set up interaction for three-band model \n";
 
-  for (int i = 0; i < BANDS; i++) {
-    for (int s1 = 0; s1 < 2; s1++) {
-      for (int j = 0; j < BANDS; j++) {
-        for (int s2 = 0; s2 < 2; s2++) {
-          if (i == 0 && j == 0 && s1 != s2)
-            H_interaction(i, s1, j, s2, origin) = U_dd;
+  // For three-band model, there are three different nn and nnn pairs:
+  // (1,0): between (px, py) orbitals in different unit cell. Note not (py,px) orbitals
+  // namely the orbital order is required !!!
+  // (0,1): between (py, px) orbitals in different unit cell
+  // (-1,1): between (py, px) orbitals in different unit cell
+  std::vector<typename RDmn::parameter_type::element_type> nn_vec(3);
+  nn_vec[0] = basis[0];
+  nn_vec[1] = basis[1];
+  nn_vec[2] = basis[1];
+  nn_vec[2][0] -= basis[1][1];
 
-          if (i == j && i != 0 && s1 != s2)
-            H_interaction(i, s1, j, s2, origin) = U_pp;
-        }
-      }
-    }
-  }
+  // check:
+  //std::cout << "nn_vec[0] = " << nn_vec[0][0] << "\t" << nn_vec[0][1] << "\n";
+  //std::cout << "nn_vec[1] = " << nn_vec[1][0] << "\t" << nn_vec[1][1] << "\n";
+  //std::cout << "nn_vec[2] = " << nn_vec[2][0] << "\t" << nn_vec[2][1] << "\n";
+
+  util::initialize3BandHint(parameters, nn_vec, H_interaction);
 }
 
 template <typename point_group_type>
