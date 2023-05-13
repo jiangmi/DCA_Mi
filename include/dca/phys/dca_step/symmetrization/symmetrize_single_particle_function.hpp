@@ -467,7 +467,9 @@ void symmetrize_single_particle_function::executeTimeOrFreq(
             if (Cluster::REPRESENTATION == domains::MOMENTUM_SPACE) {
 
                if ( (b0==0 && b1==1) || (b0==1 && b1==0) || (b0==0 && b1==2)||(b0==2 && b1==0)
-                 || (b0==3 && b1==1) || (b0==1 && b1==3) || (b0==3 && b1==2)||(b0==2 && b1==3)) {
+                 || (b0==0 && b1==4) || (b0==4 && b1==0) || (b0==0 && b1==5)||(b0==5 && b1==0)
+                 || (b0==3 && b1==1) || (b0==1 && b1==3) || (b0==3 && b1==2)||(b0==2 && b1==3)
+                 || (b0==3 && b1==4) || (b0==4 && b1==3) || (b0==3 && b1==5)||(b0==5 && b1==3)) {
                    scalartype tmp = (tmp_0 + tmp_1 - std::conj(tmp_2) - std::conj(tmp_3) - (tmp_4 + tmp_5 - std::conj(tmp_6) - std::conj(tmp_7))) / 8.;
                    f_new(b0, b1, c_ind, w_ind) = tmp;
                    f_new(b0, b1, opposite_idx, w_ind) = tmp;
