@@ -12,7 +12,7 @@
 template <typename Lattice>
 class ModelParameters<models::TightBindingModel<Lattice>> {
 public:
-  ModelParameters() : t_(0.), t_prime_(0.), U_(0.), V_(0.), V_prime_(0.) {}
+  ModelParameters() : tx_(0.), ty_(0.), t_prime_(0.), U_(0.), V_(0.), V_prime_(0.) {}
 
   template <typename Concurrency>
   int getBufferSize(const Concurrency& concurrency) const;
@@ -24,11 +24,18 @@ public:
   template <typename ReaderOrWriter>
   void readWrite(ReaderOrWriter& reader_or_writer);
 
-  double get_t() const {
-    return t_;
+  double get_tx() const {
+    return tx_;
   }
-  void set_t(const double t) {
-    t_ = t;
+  void set_tx(const double tx) {
+    tx_ = tx;
+  }
+
+  double get_ty() const {
+    return ty_;
+  }
+  void set_ty(const double ty) {
+    ty_ = ty;
   }
 
   double get_t_prime() const {
@@ -60,7 +67,8 @@ public:
   }
 
 private:
-  double t_;
+  double tx_;
+  double ty_;
   double t_prime_;
   double U_;
   double V_;
@@ -73,7 +81,8 @@ int ModelParameters<models::TightBindingModel<Lattice>>::getBufferSize(
     const Concurrency& concurrency) const {
   int buffer_size = 0;
 
-  buffer_size += concurrency.get_buffer_size(t_);
+  buffer_size += concurrency.get_buffer_size(tx_);
+  buffer_size += concurrency.get_buffer_size(ty_);
   buffer_size += concurrency.get_buffer_size(t_prime_);
   buffer_size += concurrency.get_buffer_size(U_);
   buffer_size += concurrency.get_buffer_size(V_);
@@ -87,7 +96,8 @@ template <typename Concurrency>
 void ModelParameters<models::TightBindingModel<Lattice>>::pack(const Concurrency& concurrency,
                                                                char* buffer, int buffer_size,
                                                                int& position) const {
-  concurrency.pack(buffer, buffer_size, position, t_);
+  concurrency.pack(buffer, buffer_size, position, tx_);
+  concurrency.pack(buffer, buffer_size, position, ty_);
   concurrency.pack(buffer, buffer_size, position, t_prime_);
   concurrency.pack(buffer, buffer_size, position, U_);
   concurrency.pack(buffer, buffer_size, position, V_);
@@ -99,7 +109,8 @@ template <typename Concurrency>
 void ModelParameters<models::TightBindingModel<Lattice>>::unpack(const Concurrency& concurrency,
                                                                  char* buffer, int buffer_size,
                                                                  int& position) {
-  concurrency.unpack(buffer, buffer_size, position, t_);
+  concurrency.unpack(buffer, buffer_size, position, tx_);
+  concurrency.unpack(buffer, buffer_size, position, ty_);
   concurrency.unpack(buffer, buffer_size, position, t_prime_);
   concurrency.unpack(buffer, buffer_size, position, U_);
   concurrency.unpack(buffer, buffer_size, position, V_);
@@ -113,7 +124,12 @@ void ModelParameters<models::TightBindingModel<Lattice>>::readWrite(ReaderOrWrit
     reader_or_writer.open_group("single-band-Hubbard-model");
 
     try {
-      reader_or_writer.execute("t", t_);
+      reader_or_writer.execute("tx", tx_);
+    }
+    catch (const std::exception& r_e) {
+    }
+    try {
+      reader_or_writer.execute("ty", ty_);
     }
     catch (const std::exception& r_e) {
     }

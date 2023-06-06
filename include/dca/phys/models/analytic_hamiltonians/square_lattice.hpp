@@ -27,11 +27,11 @@ namespace phys {
 namespace models {
 // dca::phys::models::
 
-template <typename point_group_type>
+template <typename /*symmetry_group*/>
 class square_lattice {
 public:
   typedef domains::no_symmetry<2> LDA_point_group;
-  typedef point_group_type DCA_point_group;
+  typedef domains::no_symmetry<2> DCA_point_group;
 
   const static int DIMENSION = 2;
   const static int BANDS = 1;
@@ -155,7 +155,8 @@ void square_lattice<point_group_type>::initialize_H_0(
 
   const auto& k_vecs = KDmn::get_elements();
 
-  const auto t = parameters.get_t();
+  const auto tx = parameters.get_tx();
+  const auto ty = parameters.get_ty();
   const auto t_prime = parameters.get_t_prime();
 
   H_0 = ScalarType(0);
@@ -163,7 +164,7 @@ void square_lattice<point_group_type>::initialize_H_0(
   for (int k_ind = 0; k_ind < KDmn::dmn_size(); ++k_ind) {
     const auto& k = k_vecs[k_ind];
     const auto val =
-        -2. * t * (std::cos(k[0]) + std::cos(k[1])) - 4. * t_prime * std::cos(k[0]) * std::cos(k[1]);
+        -2. * (tx * std::cos(k[0]) + ty * std::cos(k[1])) - 4. * t_prime * std::cos(k[0]) * std::cos(k[1]);
 
     H_0(0, 0, 0, 0, k_ind) = val;
     H_0(0, 1, 0, 1, k_ind) = val;
