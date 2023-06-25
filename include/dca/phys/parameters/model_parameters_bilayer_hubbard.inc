@@ -12,7 +12,7 @@
 template <typename PointGroup>
 class ModelParameters<models::TightBindingModel<models::bilayer_lattice<PointGroup>>> {
 public:
-  ModelParameters() : e1_(0.), e2_(0.), t1_(0.), t2_(0.), t1_prime_(0.), t2_prime_(0.), t_perp_(0.), t_perp_prime_(0.), U1_(0.), U2_(0.), V_(0.), V_prime_(0.) {}
+  ModelParameters() : e1_(0.), e2_(0.), t1_(0.), t2_(0.), t1_prime_(0.), t2_prime_(0.), t_perp_(0.), t_perp_prime_x_(0.), t_perp_prime_y_(0.), U1_(0.), U2_(0.), V_(0.), V_prime_(0.) {}
 
   template <typename Concurrency>
   int getBufferSize(const Concurrency& concurrency) const;
@@ -73,11 +73,18 @@ public:
     t_perp_ = t_perp;
   }
 
-  double get_t_perp_prime() const {
-    return t_perp_prime_;
+  double get_t_perp_prime_x() const {
+    return t_perp_prime_x_;
   }
-  void set_t_perp_prime(const double t_perp_prime) {
-    t_perp_prime_ = t_perp_prime;
+  void set_t_perp_prime_x(const double t_perp_prime_x) {
+    t_perp_prime_x_ = t_perp_prime_x;
+  }
+
+  double get_t_perp_prime_y() const {
+    return t_perp_prime_y_;
+  }
+  void set_t_perp_prime_y(const double t_perp_prime_y) {
+    t_perp_prime_y_ = t_perp_prime_y;
   }
 
   double get_U1() const {
@@ -116,7 +123,8 @@ private:
   double t1_prime_;
   double t2_prime_;
   double t_perp_;
-  double t_perp_prime_;
+  double t_perp_prime_x_;
+  double t_perp_prime_y_;
   double U1_;
   double U2_;
   double V_;
@@ -136,7 +144,8 @@ int ModelParameters<models::TightBindingModel<models::bilayer_lattice<PointGroup
   buffer_size += concurrency.get_buffer_size(t1_prime_);
   buffer_size += concurrency.get_buffer_size(t2_prime_);
   buffer_size += concurrency.get_buffer_size(t_perp_);
-  buffer_size += concurrency.get_buffer_size(t_perp_prime_);
+  buffer_size += concurrency.get_buffer_size(t_perp_prime_x_);
+  buffer_size += concurrency.get_buffer_size(t_perp_prime_y_);
   buffer_size += concurrency.get_buffer_size(U1_);
   buffer_size += concurrency.get_buffer_size(U2_);
   buffer_size += concurrency.get_buffer_size(V_);
@@ -156,7 +165,8 @@ void ModelParameters<models::TightBindingModel<models::bilayer_lattice<PointGrou
   concurrency.pack(buffer, buffer_size, position, t1_prime_);
   concurrency.pack(buffer, buffer_size, position, t2_prime_);
   concurrency.pack(buffer, buffer_size, position, t_perp_);
-  concurrency.pack(buffer, buffer_size, position, t_perp_prime_);
+  concurrency.pack(buffer, buffer_size, position, t_perp_prime_x_);
+  concurrency.pack(buffer, buffer_size, position, t_perp_prime_y_);
   concurrency.pack(buffer, buffer_size, position, U1_);
   concurrency.pack(buffer, buffer_size, position, U2_);
   concurrency.pack(buffer, buffer_size, position, V_);
@@ -174,7 +184,8 @@ void ModelParameters<models::TightBindingModel<models::bilayer_lattice<PointGrou
   concurrency.unpack(buffer, buffer_size, position, t1_prime_);
   concurrency.unpack(buffer, buffer_size, position, t2_prime_);
   concurrency.unpack(buffer, buffer_size, position, t_perp_);
-  concurrency.unpack(buffer, buffer_size, position, t_perp_prime_);
+  concurrency.unpack(buffer, buffer_size, position, t_perp_prime_x_);
+  concurrency.unpack(buffer, buffer_size, position, t_perp_prime_y_);
   concurrency.unpack(buffer, buffer_size, position, U1_);
   concurrency.unpack(buffer, buffer_size, position, U2_);
   concurrency.unpack(buffer, buffer_size, position, V_);
@@ -224,7 +235,12 @@ void ModelParameters<models::TightBindingModel<models::bilayer_lattice<PointGrou
     catch (const std::exception& r_e) {
     }
     try {
-      reader_or_writer.execute("t-perp-prime", t_perp_prime_);
+      reader_or_writer.execute("t-perp-prime-x", t_perp_prime_x_);
+    }
+    catch (const std::exception& r_e) {
+    }
+   try {
+      reader_or_writer.execute("t-perp-prime-y", t_perp_prime_y_);
     }
     catch (const std::exception& r_e) {
     }
