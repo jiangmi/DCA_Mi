@@ -60,9 +60,9 @@ void initializeSingleBandHint(
     nn_index.push_back(minus_r);
 
     // debug:
-    for (auto index : nn_index) {
-      std::cout << "nn_index = " << index << "\tvec = " << RDmn::get_elements()[index][0] << "\t" << RDmn::get_elements()[index][1] << "\n";
-    }
+  //  for (auto index : nn_index) {
+  //    std::cout << "nn_index = " << index << "\tvec = " << RDmn::get_elements()[index][0] << "\t" << RDmn::get_elements()[index][1] << "\n";
+  //  }
   }
 
   // Set all elements to zero.

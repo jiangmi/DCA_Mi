@@ -12,7 +12,7 @@
 template <typename Lattice>
 class ModelParameters<models::TightBindingModel<Lattice>> {
 public:
-  ModelParameters() : tx_(0.), ty_(0.), t_prime_(0.), U_(0.), V_(0.), V_prime_(0.) {}
+  ModelParameters() : tx_(0.), ty_(0.), tx_nn_(0.), ty_nn_(0.), t_prime_(0.), U_(0.), V_(0.), V_prime_(0.) {}
 
   template <typename Concurrency>
   int getBufferSize(const Concurrency& concurrency) const;
@@ -36,6 +36,20 @@ public:
   }
   void set_ty(const double ty) {
     ty_ = ty;
+  }
+
+  double get_tx_nn() const {
+    return tx_nn_;
+  }
+  void set_tx_nn(const double tx_nn) {
+    tx_nn_ = tx_nn;
+  }
+
+  double get_ty_nn() const {
+    return ty_nn_;
+  }
+  void set_ty_nn(const double ty_nn) {
+    ty_nn_ = ty_nn;
   }
 
   double get_t_prime() const {
@@ -69,6 +83,8 @@ public:
 private:
   double tx_;
   double ty_;
+  double tx_nn_;
+  double ty_nn_;
   double t_prime_;
   double U_;
   double V_;
@@ -83,6 +99,8 @@ int ModelParameters<models::TightBindingModel<Lattice>>::getBufferSize(
 
   buffer_size += concurrency.get_buffer_size(tx_);
   buffer_size += concurrency.get_buffer_size(ty_);
+  buffer_size += concurrency.get_buffer_size(tx_nn_);
+  buffer_size += concurrency.get_buffer_size(ty_nn_);
   buffer_size += concurrency.get_buffer_size(t_prime_);
   buffer_size += concurrency.get_buffer_size(U_);
   buffer_size += concurrency.get_buffer_size(V_);
@@ -98,6 +116,8 @@ void ModelParameters<models::TightBindingModel<Lattice>>::pack(const Concurrency
                                                                int& position) const {
   concurrency.pack(buffer, buffer_size, position, tx_);
   concurrency.pack(buffer, buffer_size, position, ty_);
+  concurrency.pack(buffer, buffer_size, position, tx_nn_);
+  concurrency.pack(buffer, buffer_size, position, ty_nn_);
   concurrency.pack(buffer, buffer_size, position, t_prime_);
   concurrency.pack(buffer, buffer_size, position, U_);
   concurrency.pack(buffer, buffer_size, position, V_);
@@ -111,6 +131,8 @@ void ModelParameters<models::TightBindingModel<Lattice>>::unpack(const Concurren
                                                                  int& position) {
   concurrency.unpack(buffer, buffer_size, position, tx_);
   concurrency.unpack(buffer, buffer_size, position, ty_);
+  concurrency.unpack(buffer, buffer_size, position, tx_nn_);
+  concurrency.unpack(buffer, buffer_size, position, ty_nn_);
   concurrency.unpack(buffer, buffer_size, position, t_prime_);
   concurrency.unpack(buffer, buffer_size, position, U_);
   concurrency.unpack(buffer, buffer_size, position, V_);
@@ -130,6 +152,16 @@ void ModelParameters<models::TightBindingModel<Lattice>>::readWrite(ReaderOrWrit
     }
     try {
       reader_or_writer.execute("ty", ty_);
+    }
+    catch (const std::exception& r_e) {
+    }
+    try {
+      reader_or_writer.execute("tx_nn", tx_nn_);
+    }
+    catch (const std::exception& r_e) {
+    }
+    try {
+      reader_or_writer.execute("ty_nn", ty_nn_);
     }
     catch (const std::exception& r_e) {
     }
