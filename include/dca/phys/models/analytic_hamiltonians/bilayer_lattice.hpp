@@ -32,7 +32,11 @@ template <typename point_group_type>
 class bilayer_lattice {
 public:
   typedef domains::no_symmetry<2> LDA_point_group;
-  typedef point_group_type DCA_point_group;
+ //  typedef point_group_type DCA_point_group;
+
+  // Aug.17, 2023 debug
+  // for C4-C2 rotational sym breaking cases:
+  typedef domains::no_symmetry<2> DCA_point_group;
 
   const static ClusterShapeType DCA_cluster_shape = BETT_CLUSTER;
   const static ClusterShapeType LDA_cluster_shape = PARALLELEPIPED;

@@ -465,7 +465,7 @@ void symmetrize_single_particle_function::executeTimeOrFreq(
             scalartype tmp_7 = f(b1, b0, opposite_idx, w_0 - w_ind);
 
             if (Cluster::REPRESENTATION == domains::MOMENTUM_SPACE) {
-
+             /*
                if ( (b0==0 && b1==1) || (b0==1 && b1==0) || (b0==0 && b1==2)||(b0==2 && b1==0)
                  || (b0==0 && b1==4) || (b0==4 && b1==0) || (b0==0 && b1==5)||(b0==5 && b1==0)
                  || (b0==3 && b1==1) || (b0==1 && b1==3) || (b0==3 && b1==2)||(b0==2 && b1==3)
@@ -484,7 +484,7 @@ void symmetrize_single_particle_function::executeTimeOrFreq(
                    //std::cout << "b0,b1 =(" << b0 << b1 << "), tmps = " << tmp_0 << "\t" << tmp_1 << "\t" << -std::conj(tmp_2) << "\t" 
                    //          << -std::conj(tmp_3) << "\t" << -tmp_4 << "\t" << -tmp_5 << "\t" << std::conj(tmp_6) << "\t" << std::conj(tmp_7) << "\n\n";
                    }
-                else {
+                else { */
                    scalartype tmp = (tmp_0 + tmp_1 + std::conj(tmp_2) + std::conj(tmp_3) + (tmp_4 + tmp_5 + std::conj(tmp_6) + std::conj(tmp_7))) / 8.;
                    f_new(b0, b1, c_ind, w_ind) = tmp;
                    f_new(b0, b1, opposite_idx, w_ind) = tmp;
@@ -494,11 +494,20 @@ void symmetrize_single_particle_function::executeTimeOrFreq(
                    f_new(b1, b0, opposite_idx, w_ind) = tmp;
                    f_new(b1, b0, c_ind, w_0 - w_ind) = std::conj(tmp);
                    f_new(b1, b0, opposite_idx, w_0 - w_ind) = std::conj(tmp);
+                
+                   // Aug.17, 2023 MJ debug:
+                   // for C4->C2 rotational sym breaking cases:
+              //     scalartype tmp = (tmp_0 + std::conj(tmp_2) + (tmp_4 + std::conj(tmp_6))) / 4.;
+              //     f_new(b0, b1, c_ind, w_ind) = tmp;
+              //     f_new(b0, b1, c_ind, w_0 - w_ind) = std::conj(tmp);
+              //     f_new(b1, b0, c_ind, w_ind) = tmp;
+              //     f_new(b1, b0, c_ind, w_0 - w_ind) = std::conj(tmp);
+
 
                    // Dec.24, 2022 MJ debug:
                    //std::cout << "b0,b1 =(" << b0 << b1 << "), tmps = " << tmp_0 << "\t" << tmp_1 << "\t" << std::conj(tmp_2) << "\t" 
                    //          << std::conj(tmp_3) << "\t" << tmp_4 << "\t" << tmp_5 << "\t" << std::conj(tmp_6) << "\t" << std::conj(tmp_7) << "\n\n";
-                 }
+                // }
                }
             else if (Cluster::REPRESENTATION == domains::REAL_SPACE) {
                 scalartype tmp = (tmp_0 + std::conj(tmp_7)) / 2.;
