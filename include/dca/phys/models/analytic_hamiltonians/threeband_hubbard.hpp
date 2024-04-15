@@ -169,7 +169,7 @@ void threeband_hubbard<point_group_type>::initialize_H_interaction(
   // namely the orbital order is required !!!
   // (0,1): between (py, px) orbitals in different unit cell
   // (-1,1): between (py, px) orbitals in different unit cell
-  const std::vector<typename RDmn::parameter_type::element_type> nn_vec_Vpp(3);
+  std::vector<typename RDmn::parameter_type::element_type> nn_vec_Vpp(3);
   nn_vec_Vpp[0] = basis[0];
   nn_vec_Vpp[1] = basis[1];
   nn_vec_Vpp[2] = basis[1];

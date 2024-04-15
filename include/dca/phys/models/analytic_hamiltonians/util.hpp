@@ -236,35 +236,35 @@ void initialize3BandHint(
     
   // set V_pdx between unit cell with (1,0) separation between (px, d) orbitals
   //                             and (-1,0) separation between (d, px) orbitals
-  std::vector<double> nn_vec_translated0 =
+  std::vector<double> nn_vec_translated3 =
       domains::cluster_operations::translate_inside_cluster(nn_vec_Vpd[0], super_basis);
 
-  int i0 = domains::cluster_operations::index(nn_vec_translated0, elements, domains::BRILLOUIN_ZONE);
-  int minus_i0 = RDmn::parameter_type::subtract(i0, origin);
+  int i3 = domains::cluster_operations::index(nn_vec_translated3, elements, domains::BRILLOUIN_ZONE);
+  int minus_i3 = RDmn::parameter_type::subtract(i3, origin);
     
   //std::cout << "i0 " << i0 << "\t" << RDmn::get_elements()[i0][0] << "\t" << RDmn::get_elements()[i0][1] << "\n";
 
   for (int s1 = 0; s1 < 2; s1++) {
     for (int s2 = 0; s2 < 2; s2++) {
-      H_int(1, s1, 0, s2, i0)       = V_pdx;
-      H_int(0, s1, 1, s2, minus_i0) = V_pdx;
+      H_int(1, s1, 0, s2, i3)       = V_pdx;
+      H_int(0, s1, 1, s2, minus_i3) = V_pdx;
     }
   }
     
   // set V_pdy between unit cell with (0,1) separation between (py, d) orbitals
   //                             and (0,-1) separation between (d, py) orbitals
-  std::vector<double> nn_vec_translated0 =
+  std::vector<double> nn_vec_translated4 =
       domains::cluster_operations::translate_inside_cluster(nn_vec_Vpd[1], super_basis);
 
-  int i0 = domains::cluster_operations::index(nn_vec_translated0, elements, domains::BRILLOUIN_ZONE);
-  int minus_i0 = RDmn::parameter_type::subtract(i0, origin);
+  int i4 = domains::cluster_operations::index(nn_vec_translated4, elements, domains::BRILLOUIN_ZONE);
+  int minus_i4 = RDmn::parameter_type::subtract(i4, origin);
     
   //std::cout << "i0 " << i0 << "\t" << RDmn::get_elements()[i0][0] << "\t" << RDmn::get_elements()[i0][1] << "\n";
 
   for (int s1 = 0; s1 < 2; s1++) {
     for (int s2 = 0; s2 < 2; s2++) {
-      H_int(2, s1, 0, s2, i0)       = V_pdy;
-      H_int(0, s1, 2, s2, minus_i0) = V_pdy;
+      H_int(2, s1, 0, s2, i4)       = V_pdy;
+      H_int(0, s1, 2, s2, minus_i4) = V_pdy;
     }
   }
     
