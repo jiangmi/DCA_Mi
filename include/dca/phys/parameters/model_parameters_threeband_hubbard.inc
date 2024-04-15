@@ -25,11 +25,17 @@ public:
   template <typename ReaderOrWriter>
   void readWrite(ReaderOrWriter& reader_or_writer);
 
-  double get_t_pd() const {
-    return t_pd_;
+  double get_t_pdx() const {
+    return t_pdx_;
   }
-  void set_t_pd(const double t_pd) {
-    t_pd_ = t_pd;
+  double get_t_pdy() const {
+    return t_pdy_;
+  }
+  void set_t_pdx(const double t_pdx) {
+    t_pdx_ = t_pdx;
+  }
+  void set_t_pdy(const double t_pdy) {
+    t_pdy_ = t_pdy;
   }
 
   double get_t_pp() const {
@@ -88,8 +94,16 @@ public:
     V_pp_prime_ = V_pp_prime;
   }
 
+  double get_V_pd() const {
+    return V_pd_;
+  }
+  void set_V_pd(const double V_pd) {
+    V_pd_ = V_pd;
+  }
+
 private:
-  double t_pd_ = 0;
+  double t_pdx_ = 0;
+  double t_pdy_ = 0;
   double t_pp_ = 0;
   double ep_px_ = 0;
   double ep_py_ = 0;
@@ -98,6 +112,7 @@ private:
   double U_pp_ = 0;
   double V_pp_ = 0;
   double V_pp_prime_ = 0;
+  double V_pd_ = 0;
 };
 
 template <typename PointGroup>
@@ -106,7 +121,8 @@ int ModelParameters<models::TightBindingModel<models::threeband_hubbard<PointGro
     const Concurrency& concurrency) const {
   int buffer_size = 0;
 
-  buffer_size += concurrency.get_buffer_size(t_pd_);
+  buffer_size += concurrency.get_buffer_size(t_pdx_);
+  buffer_size += concurrency.get_buffer_size(t_pdy_);
   buffer_size += concurrency.get_buffer_size(t_pp_);
   buffer_size += concurrency.get_buffer_size(ep_px_);
   buffer_size += concurrency.get_buffer_size(ep_py_);
@@ -115,6 +131,7 @@ int ModelParameters<models::TightBindingModel<models::threeband_hubbard<PointGro
   buffer_size += concurrency.get_buffer_size(U_pp_);
   buffer_size += concurrency.get_buffer_size(V_pp_);
   buffer_size += concurrency.get_buffer_size(V_pp_prime_);
+  buffer_size += concurrency.get_buffer_size(V_pd_);
 
   return buffer_size;
 }
@@ -123,7 +140,8 @@ template <typename PointGroup>
 template <typename Concurrency>
 void ModelParameters<models::TightBindingModel<models::threeband_hubbard<PointGroup>>>::pack(
     const Concurrency& concurrency, char* buffer, int buffer_size, int& position) const {
-  concurrency.pack(buffer, buffer_size, position, t_pd_);
+  concurrency.pack(buffer, buffer_size, position, t_pdx_);
+  concurrency.pack(buffer, buffer_size, position, t_pdy_);
   concurrency.pack(buffer, buffer_size, position, t_pp_);
   concurrency.pack(buffer, buffer_size, position, ep_px_);
   concurrency.pack(buffer, buffer_size, position, ep_py_);
@@ -132,13 +150,15 @@ void ModelParameters<models::TightBindingModel<models::threeband_hubbard<PointGr
   concurrency.pack(buffer, buffer_size, position, U_pp_);
   concurrency.pack(buffer, buffer_size, position, V_pp_);
   concurrency.pack(buffer, buffer_size, position, V_pp_prime_);
+  concurrency.pack(buffer, buffer_size, position, V_pd_);
 }
 
 template <typename PointGroup>
 template <typename Concurrency>
 void ModelParameters<models::TightBindingModel<models::threeband_hubbard<PointGroup>>>::unpack(
     const Concurrency& concurrency, char* buffer, int buffer_size, int& position) {
-  concurrency.unpack(buffer, buffer_size, position, t_pd_);
+  concurrency.unpack(buffer, buffer_size, position, t_pdx_);
+  concurrency.unpack(buffer, buffer_size, position, t_pdy_);
   concurrency.unpack(buffer, buffer_size, position, t_pp_);
   concurrency.unpack(buffer, buffer_size, position, ep_px_);
   concurrency.unpack(buffer, buffer_size, position, ep_py_);
@@ -147,6 +167,7 @@ void ModelParameters<models::TightBindingModel<models::threeband_hubbard<PointGr
   concurrency.unpack(buffer, buffer_size, position, U_pp_);
   concurrency.unpack(buffer, buffer_size, position, V_pp_);
   concurrency.unpack(buffer, buffer_size, position, V_pp_prime_);
+  concurrency.unpack(buffer, buffer_size, position, V_pd_);
 }
 
 template <typename PointGroup>
@@ -157,7 +178,12 @@ void ModelParameters<models::TightBindingModel<models::threeband_hubbard<PointGr
     reader_or_writer.open_group("threebands-Hubbard-model");
 
     try {
-      reader_or_writer.execute("t_pd", t_pd_);
+      reader_or_writer.execute("t_pdx", t_pdx_);
+    }
+    catch (const std::exception& r_e) {
+    }
+    try {
+      reader_or_writer.execute("t_pdy", t_pdy_);
     }
     catch (const std::exception& r_e) {
     }
@@ -201,6 +227,11 @@ void ModelParameters<models::TightBindingModel<models::threeband_hubbard<PointGr
     }
     catch (const std::exception& r_e) {
     }
+    try {
+      reader_or_writer.execute("V_pd", V_pd_);
+    }
+    catch (const std::exception& r_e) {
+    }   
 
     reader_or_writer.close_group();
   }

@@ -210,9 +210,10 @@ void threeband_hubbard<point_group_type>::initialize_H_0(
 
   const auto& k_vecs = KDmn::get_elements();
 
-  const auto t_pd = parameters.get_t_pd();
-  const auto t_pp = parameters.get_t_pp();
-  const auto ep_d = parameters.get_ep_d();
+  const auto t_pdx = parameters.get_t_pdx();
+  const auto t_pdy = parameters.get_t_pdy();
+  const auto t_pp  = parameters.get_t_pp();
+  const auto ep_d  = parameters.get_ep_d();
   const auto ep_px = parameters.get_ep_px();
   const auto ep_py = parameters.get_ep_py();
 
@@ -222,8 +223,8 @@ void threeband_hubbard<point_group_type>::initialize_H_0(
 
   for (int k_ind = 0; k_ind < KDmn::dmn_size(); ++k_ind) {
     const auto& k = k_vecs[k_ind];
-    const auto valdpx = 2. * I * t_pd * std::sin(k[0] / 2.);
-    const auto valdpy = -2. * I * t_pd * std::sin(k[1] / 2.);
+    const auto valdpx = 2. * I * t_pdx * std::sin(k[0] / 2.);
+    const auto valdpy = -2. * I * t_pdy * std::sin(k[1] / 2.);
     const auto valpxpy = 4. * t_pp * std::sin(k[0] / 2.) * std::sin(k[1] / 2.);
 
     for (int s = 0; s < 2; s++) {
