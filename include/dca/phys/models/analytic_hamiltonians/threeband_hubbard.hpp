@@ -169,18 +169,19 @@ void threeband_hubbard<point_group_type>::initialize_H_interaction(
   // namely the orbital order is required !!!
   // (0,1): between (py, px) orbitals in different unit cell
   // (-1,1): between (py, px) orbitals in different unit cell
-  std::vector<typename RDmn::parameter_type::element_type> nn_vec(3);
-  nn_vec[0] = basis[0];
-  nn_vec[1] = basis[1];
-  nn_vec[2] = basis[1];
-  nn_vec[2][0] -= basis[1][1];
+  const std::vector<typename RDmn::parameter_type::element_type> nn_vec_Vpp(3);
+  nn_vec_Vpp[0] = basis[0];
+  nn_vec_Vpp[1] = basis[1];
+  nn_vec_Vpp[2] = basis[1];
+  nn_vec_Vpp[2][0] -= basis[1][1];
 
   // check:
-  //std::cout << "nn_vec[0] = " << nn_vec[0][0] << "\t" << nn_vec[0][1] << "\n";
-  //std::cout << "nn_vec[1] = " << nn_vec[1][0] << "\t" << nn_vec[1][1] << "\n";
-  //std::cout << "nn_vec[2] = " << nn_vec[2][0] << "\t" << nn_vec[2][1] << "\n";
+  //std::cout << "nn_vec_Vpp[0] = " << nn_vec_Vpp[0][0] << "\t" << nn_vec_Vpp[0][1] << "\n";
+  //std::cout << "nn_vec_Vpp[1] = " << nn_vec_Vpp[1][0] << "\t" << nn_vec_Vpp[1][1] << "\n";
+  //std::cout << "nn_vec_Vpp[2] = " << nn_vec_Vpp[2][0] << "\t" << nn_vec_Vpp[2][1] << "\n";
 
-  util::initialize3BandHint(parameters, nn_vec, H_interaction);
+  // basis is for setting Vpd
+  util::initialize3BandHint(parameters, nn_vec_Vpp, basis, H_interaction);
 }
 
 template <typename point_group_type>

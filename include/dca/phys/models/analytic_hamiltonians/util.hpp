@@ -102,6 +102,7 @@ template <typename ParametersType, typename BandDmn, typename SpinDmn, typename 
 void initialize3BandHint(
     const ParametersType& parameters,
     const std::vector<typename RDmn::parameter_type::element_type>& nn_vec,
+    const std::vector<typename RDmn::parameter_type::element_type>& nn_vec_Vpd,
     func::function<double, func::dmn_variadic<func::dmn_variadic<BandDmn, SpinDmn>,
                                               func::dmn_variadic<BandDmn, SpinDmn>, RDmn>>& H_int) {
   if (BandDmn::dmn_size() != 3)
@@ -133,7 +134,11 @@ void initialize3BandHint(
   // Nearest-neighbor same spin interaction between px and py
   const double V_pp_prime = parameters.get_V_pp_prime();
     
-  // set V_pp within unit cell
+  // Nearest-neighbor interaction Vpd
+  const double V_pdx = parameters.get_V_pdx();
+  const double V_pdy = parameters.get_V_pdy();
+    
+  // set V_pp within the same unit cell
   for (int i = 1; i < BANDS; i++) {
     for (int s1 = 0; s1 < 2; s1++) {
       for (int j = 1; j < BANDS; j++) {
@@ -148,7 +153,19 @@ void initialize3BandHint(
     }
   }
     
+  // set V_pd within the same unit cell
+  for (int s1 = 0; s1 < 2; s1++) {
+    for (int s2 = 0; s2 < 2; s2++) {
+      H_int(0, s1, 1, s2, origin) = V_pdx;
+      H_int(1, s1, 0, s2, origin) = V_pdx;
+      H_int(0, s1, 2, s2, origin) = V_pdy;
+      H_int(2, s1, 0, s2, origin) = V_pdy;
+    }
+  }
+    
+    
   // set V_pp between unit cell with (1,0) separation between (px, py) orbitals
+  //                            and (-1,0) separation between (py, px) orbitals
   std::vector<double> nn_vec_translated0 =
       domains::cluster_operations::translate_inside_cluster(nn_vec[0], super_basis);
 
@@ -172,6 +189,7 @@ void initialize3BandHint(
     
     
   // set V_pp between unit cell with (0,1) separation between (py, px) orbitals
+  //                            and (0,-1) separation between (px, py) orbitals
   std::vector<double> nn_vec_translated1 =
       domains::cluster_operations::translate_inside_cluster(nn_vec[1], super_basis);
   int i1 = domains::cluster_operations::index(nn_vec_translated1, elements, domains::BRILLOUIN_ZONE);
@@ -214,6 +232,42 @@ void initialize3BandHint(
       }
     }
   }
+    
+    
+  // set V_pdx between unit cell with (1,0) separation between (px, d) orbitals
+  //                             and (-1,0) separation between (d, px) orbitals
+  std::vector<double> nn_vec_translated0 =
+      domains::cluster_operations::translate_inside_cluster(nn_vec_Vpd[0], super_basis);
+
+  int i0 = domains::cluster_operations::index(nn_vec_translated0, elements, domains::BRILLOUIN_ZONE);
+  int minus_i0 = RDmn::parameter_type::subtract(i0, origin);
+    
+  //std::cout << "i0 " << i0 << "\t" << RDmn::get_elements()[i0][0] << "\t" << RDmn::get_elements()[i0][1] << "\n";
+
+  for (int s1 = 0; s1 < 2; s1++) {
+    for (int s2 = 0; s2 < 2; s2++) {
+      H_int(1, s1, 0, s2, i0)       = V_pdx;
+      H_int(0, s1, 1, s2, minus_i0) = V_pdx;
+    }
+  }
+    
+  // set V_pdy between unit cell with (0,1) separation between (py, d) orbitals
+  //                             and (0,-1) separation between (d, py) orbitals
+  std::vector<double> nn_vec_translated0 =
+      domains::cluster_operations::translate_inside_cluster(nn_vec_Vpd[1], super_basis);
+
+  int i0 = domains::cluster_operations::index(nn_vec_translated0, elements, domains::BRILLOUIN_ZONE);
+  int minus_i0 = RDmn::parameter_type::subtract(i0, origin);
+    
+  //std::cout << "i0 " << i0 << "\t" << RDmn::get_elements()[i0][0] << "\t" << RDmn::get_elements()[i0][1] << "\n";
+
+  for (int s1 = 0; s1 < 2; s1++) {
+    for (int s2 = 0; s2 < 2; s2++) {
+      H_int(2, s1, 0, s2, i0)       = V_pdy;
+      H_int(0, s1, 2, s2, minus_i0) = V_pdy;
+    }
+  }
+    
     
     
   // On-site interaction
