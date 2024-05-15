@@ -12,7 +12,7 @@
 template <typename Lattice>
 class ModelParameters<models::TightBindingModel<Lattice>> {
 public:
-  ModelParameters() : tx_(0.), ty_(0.), tx_nn_(0.), ty_nn_(0.), t_prime_(0.), U_(0.), V_(0.), V_prime_(0.) {}
+  ModelParameters() : tx_(0.), ty_(0.), tx_nn_(0.), ty_nn_(0.), t_prime_(0.), U_(0.), V_(0.), V_prime_(0.), Vpp_(0.) {}
 
   template <typename Concurrency>
   int getBufferSize(const Concurrency& concurrency) const;
@@ -80,6 +80,13 @@ public:
     V_prime_ = V_prime;
   }
 
+  double get_Vpp() const {
+    return Vpp_;
+  }
+  void set_Vpp(const double Vpp) {
+    Vpp_ = Vpp;
+  }
+
 private:
   double tx_;
   double ty_;
@@ -89,6 +96,7 @@ private:
   double U_;
   double V_;
   double V_prime_;
+  double Vpp_;
 };
 
 template <typename Lattice>
@@ -105,6 +113,7 @@ int ModelParameters<models::TightBindingModel<Lattice>>::getBufferSize(
   buffer_size += concurrency.get_buffer_size(U_);
   buffer_size += concurrency.get_buffer_size(V_);
   buffer_size += concurrency.get_buffer_size(V_prime_);
+  buffer_size += concurrency.get_buffer_size(Vpp_);
 
   return buffer_size;
 }
@@ -122,6 +131,7 @@ void ModelParameters<models::TightBindingModel<Lattice>>::pack(const Concurrency
   concurrency.pack(buffer, buffer_size, position, U_);
   concurrency.pack(buffer, buffer_size, position, V_);
   concurrency.pack(buffer, buffer_size, position, V_prime_);
+  concurrency.pack(buffer, buffer_size, position, Vpp_);
 }
 
 template <typename Lattice>
@@ -137,6 +147,7 @@ void ModelParameters<models::TightBindingModel<Lattice>>::unpack(const Concurren
   concurrency.unpack(buffer, buffer_size, position, U_);
   concurrency.unpack(buffer, buffer_size, position, V_);
   concurrency.unpack(buffer, buffer_size, position, V_prime_);
+  concurrency.unpack(buffer, buffer_size, position, Vpp_);
 }
 
 template <typename Lattice>
@@ -182,6 +193,11 @@ void ModelParameters<models::TightBindingModel<Lattice>>::readWrite(ReaderOrWrit
     }
     try {
       reader_or_writer.execute("V-prime", V_prime_);
+    }
+    catch (const std::exception& r_e) {
+    }
+    try {
+      reader_or_writer.execute("Vpp", Vpp_);
     }
     catch (const std::exception& r_e) {
     }

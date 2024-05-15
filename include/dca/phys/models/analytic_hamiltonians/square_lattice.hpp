@@ -121,16 +121,27 @@ void square_lattice<point_group_type>::initialize_H_interaction(
   if (SpinDmn::dmn_size() != 2)
     throw std::logic_error("Spin domain size must be 2.");
 
+  // basis = [1,0] and [0,1] in order !!!
   const std::vector<typename RDmn::parameter_type::element_type>& basis =
       RDmn::parameter_type::get_basis_vectors();
 
+  // debug:
+  //std::cout << "basis[0] = " << basis[0][0] << "\t" << basis[0][1] << "\t" << basis[1][0] << "\t" << basis[1][1] << "\n";
+
   assert(basis.size() == 2);
 
-  // There are two different nearest neighbor (nn) pairs: along the basis vector a1 and along the
-  // basis vector a2.
+  // There are two nearest neighbor (nn) pairs: along the basis vector a1 and along the
+  // basis vector a2. Their inverse vectors will be set in util.cpp
   const std::vector<typename RDmn::parameter_type::element_type>& nn_vec(basis);
 
-  util::initializeSingleBandHint(parameters, nn_vec, H_interaction);
+  // Two different nnn pairs: (1,1) and (1,-1)
+  std::vector<typename RDmn::parameter_type::element_type> nnn_vec(2);
+  nnn_vec[0] = basis[0];
+  nnn_vec[1] = basis[0];
+  nnn_vec[0][1] += basis[0][0];
+  nnn_vec[1][1] -= basis[0][0];
+                   
+  util::initializeSingleBandHint(parameters, nn_vec, nnn_vec, H_interaction);
 }
 
 template <typename point_group_type>

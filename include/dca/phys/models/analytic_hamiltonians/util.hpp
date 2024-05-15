@@ -31,7 +31,8 @@ namespace util {
 template <typename ParametersType, typename BandDmn, typename SpinDmn, typename RDmn>
 void initializeSingleBandHint(
     const ParametersType& parameters,
-    const std::vector<typename RDmn::parameter_type::element_type>& nn_vec,
+    const std::vector<typename RDmn::parameter_type::element_type>& nn_vec, 
+    const std::vector<typename RDmn::parameter_type::element_type>& nnn_vec,
     func::function<double, func::dmn_variadic<func::dmn_variadic<BandDmn, SpinDmn>,
                                               func::dmn_variadic<BandDmn, SpinDmn>, RDmn>>& H_int) {
   if (BandDmn::dmn_size() != 1)
@@ -42,8 +43,9 @@ void initializeSingleBandHint(
   // Get the index of the origin (0,0).
   const int origin = RDmn::parameter_type::origin_index();
 
-  // Compute indices of nearest neighbors (nn) w.r.t. origin.
+  // Compute indices of nearest neighbors (nn) and nnn w.r.t. origin.
   std::vector<int> nn_index;
+  std::vector<int> nnn_index;
 
   const std::vector<typename RDmn::parameter_type::element_type>& super_basis =
       RDmn::parameter_type::get_super_basis_vectors();
@@ -60,9 +62,19 @@ void initializeSingleBandHint(
     nn_index.push_back(minus_r);
 
     // debug:
-  //  for (auto index : nn_index) {
-  //    std::cout << "nn_index = " << index << "\tvec = " << RDmn::get_elements()[index][0] << "\t" << RDmn::get_elements()[index][1] << "\n";
-  //  }
+    //for (auto index : nn_index) {
+    //  std::cout << "nn_index = " << index << "\tvec = " << RDmn::get_elements()[index][0] << "\t" << RDmn::get_elements()[index][1] << "\n";
+    //}
+  }
+
+  for (const auto& vec : nnn_vec) {
+    std::vector<double> nnn_vec_translated =
+        domains::cluster_operations::translate_inside_cluster(vec, super_basis);
+    int tmp = domains::cluster_operations::index(nnn_vec_translated, elements, domains::BRILLOUIN_ZONE);
+    nnn_index.push_back(tmp);
+
+    const int minus_r = RDmn::parameter_type::subtract(tmp, origin);
+    nnn_index.push_back(minus_r);
   }
 
   // Set all elements to zero.
@@ -80,6 +92,15 @@ void initializeSingleBandHint(
   for (auto index : nn_index) {
     H_int(0, 0, 0, 0, index) = V_prime;
     H_int(0, 1, 0, 1, index) = V_prime;
+  }
+
+  // nnn same and oppo spin interaction
+  const double Vpp = parameters.get_Vpp();
+  for (auto index : nnn_index) {
+    H_int(0, 0, 0, 0, index) = Vpp;
+    H_int(0, 1, 0, 1, index) = Vpp;
+    H_int(0, 0, 0, 1, index) = Vpp;
+    H_int(0, 1, 0, 0, index) = Vpp;
   }
 
   // On-site interaction
