@@ -25,6 +25,7 @@
 #include "dca/phys/models/analytic_hamiltonians/twoband_chain.hpp"
 #include "dca/phys/models/analytic_hamiltonians/singleband_chain.hpp"
 #include "dca/phys/models/analytic_hamiltonians/threeband_hubbard.hpp"
+#include "dca/phys/models/analytic_hamiltonians/ani3band_hubbard.hpp"
 #include "dca/phys/models/analytic_hamiltonians/bilayer_threeband.hpp"
 #include "dca/phys/models/analytic_hamiltonians/dpsNi_model.hpp"
 #include "dca/phys/models/analytic_hamiltonians/ddp_model.hpp"
@@ -66,6 +67,7 @@ class ModelParameters {};
 #include "model_parameters_singleband_chain.inc"
 #include "model_parameters_twoband_chain.inc"
 #include "model_parameters_threeband_hubbard.inc"
+#include "model_parameters_ani3band_hubbard.inc"
 #include "model_parameters_bilayer_threeband_model.inc"
 
 #include "model_parameters_dpsNimodel.inc"

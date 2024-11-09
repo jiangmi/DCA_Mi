@@ -69,8 +69,8 @@ endif()
 
 # Lattice type
 set(DCA_LATTICE "square" CACHE STRING
-    "Lattice type, options are: bilayer | trilayer | dsmodel | square | threeband | bilayer_threeband | dpsNimodel | ddp_model | triangular | twoband_chain | singleband_chain.")
-set_property(CACHE DCA_LATTICE PROPERTY STRINGS bilayer trilayer dsmodel square threeband bilayer_threeband dpsNimodel ddp_model triangular twoband_chain singleband_chain)
+    "Lattice type, options are: bilayer | trilayer | dsmodel | square | threeband |  ani3band | bilayer_3band | dpsNimodel | ddp_model | triangular | twoband_chain | singleband_chain.")
+set_property(CACHE DCA_LATTICE PROPERTY STRINGS bilayer trilayer dsmodel square threeband ani3band bilayer_3band dpsNimodel ddp_model triangular twoband_chain singleband_chain)
 
 if (DCA_LATTICE STREQUAL "bilayer")
   set(DCA_LATTICE_TYPE dca::phys::models::bilayer_lattice<PointGroup>)
@@ -102,7 +102,12 @@ elseif (DCA_LATTICE STREQUAL "threeband")
   set(DCA_LATTICE_INCLUDE
     "dca/phys/models/analytic_hamiltonians/threeband_hubbard.hpp")
 
-elseif (DCA_LATTICE STREQUAL "bilayer_threeband")
+elseif (DCA_LATTICE STREQUAL "ani3band")
+  set(DCA_LATTICE_TYPE dca::phys::models::ani3band_hubbard<PointGroup>)
+  set(DCA_LATTICE_INCLUDE
+    "dca/phys/models/analytic_hamiltonians/ani3band_hubbard.hpp")
+
+elseif (DCA_LATTICE STREQUAL "bilayer_3band")
   set(DCA_LATTICE_TYPE dca::phys::models::bilayer_threeband_model<PointGroup>)
   set(DCA_LATTICE_INCLUDE
     "dca/phys/models/analytic_hamiltonians/bilayer_threeband.hpp")
@@ -128,7 +133,7 @@ elseif (DCA_LATTICE STREQUAL "singleband_chain")
       "dca/phys/models/analytic_hamiltonians/singleband_chain.hpp")
 else()
   message(FATAL_ERROR
-          "Please set DCA_LATTICE to a valid option: bilayer | trilayer | dsmodel | square | threeband | bilayer_threeband | dpsNimodel | ddp_model | triangular | twoband_chain | singleband_chain.")
+          "Please set DCA_LATTICE to a valid option: bilayer | trilayer | dsmodel | square | threeband | ani3band | bilayer_3band | dpsNimodel | ddp_model | triangular | twoband_chain | singleband_chain.")
 endif()
 
 # Model type

@@ -9,8 +9,8 @@
 //
 // Bilayer lattice.
 
-#ifndef DCA_PHYS_MODELS_ANALYTIC_HAMILTONIANS_THREEBAND_LATTICE_HPP
-#define DCA_PHYS_MODELS_ANALYTIC_HAMILTONIANS_THREEBAND_LATTICE_HPP
+#ifndef DCA_PHYS_MODELS_ANALYTIC_HAMILTONIANS_ANI3BAND_LATTICE_HPP
+#define DCA_PHYS_MODELS_ANALYTIC_HAMILTONIANS_ANI3BAND_LATTICE_HPP
 
 #include <cmath>
 #include <stdexcept>
@@ -20,6 +20,7 @@
 #include "dca/function/domains.hpp"
 #include "dca/function/function.hpp"
 #include "dca/phys/domains/cluster/symmetries/point_groups/no_symmetry.hpp"
+#include "dca/phys/models/analytic_hamiltonians/util.hpp"
 #include "dca/phys/models/analytic_hamiltonians/cluster_shape_type.hpp"
 #include "dca/util/type_list.hpp"
 
@@ -30,7 +31,7 @@ namespace models {
 
 // TODO: the symmetry of this system must be checked.
 template <typename /*symmetry_group*/>
-class threeband_hubbard {
+class ani3band_hubbard {
 public:
   using LDA_point_group = domains::no_symmetry<2>;
   using DCA_point_group = domains::no_symmetry<2>;
@@ -73,7 +74,7 @@ public:
 };
 
 template <typename point_group_type>
-double* threeband_hubbard<point_group_type>::initialize_r_DCA_basis() {
+double* ani3band_hubbard<point_group_type>::initialize_r_DCA_basis() {
   static double* r_DCA = new double[4];
   r_DCA[0] = 1.0;
   r_DCA[1] = 0.0;
@@ -84,7 +85,7 @@ double* threeband_hubbard<point_group_type>::initialize_r_DCA_basis() {
 }
 
 template <typename point_group_type>
-double* threeband_hubbard<point_group_type>::initialize_k_DCA_basis() {
+double* ani3band_hubbard<point_group_type>::initialize_k_DCA_basis() {
   static double* k_DCA = new double[4];
 
   k_DCA[0] = 2 * M_PI;
@@ -96,7 +97,7 @@ double* threeband_hubbard<point_group_type>::initialize_k_DCA_basis() {
 }
 
 template <typename point_group_type>
-double* threeband_hubbard<point_group_type>::initialize_r_LDA_basis() {
+double* ani3band_hubbard<point_group_type>::initialize_r_LDA_basis() {
   static double* r_LDA = new double[4];
 
   r_LDA[0] = 1.;
@@ -108,7 +109,7 @@ double* threeband_hubbard<point_group_type>::initialize_r_LDA_basis() {
 }
 
 template <typename point_group_type>
-double* threeband_hubbard<point_group_type>::initialize_k_LDA_basis() {
+double* ani3band_hubbard<point_group_type>::initialize_k_LDA_basis() {
   static double* k_LDA = new double[4];
 
   k_LDA[0] = 2. * M_PI;
@@ -120,7 +121,7 @@ double* threeband_hubbard<point_group_type>::initialize_k_LDA_basis() {
 }
 
 template <typename point_group_type>
-std::vector<int> threeband_hubbard<point_group_type>::get_flavors() {
+std::vector<int> ani3band_hubbard<point_group_type>::get_flavors() {
   static std::vector<int> flavors(BANDS);
 
   flavors[0] = 0;
@@ -131,7 +132,7 @@ std::vector<int> threeband_hubbard<point_group_type>::get_flavors() {
 }
 
 template <typename point_group_type>
-std::vector<std::vector<double>> threeband_hubbard<point_group_type>::get_a_vectors() {
+std::vector<std::vector<double>> ani3band_hubbard<point_group_type>::get_a_vectors() {
   static std::vector<std::vector<double>> a_vecs{
       std::vector<double>{0, 0}, std::vector<double>{0.5, 0}, std::vector<double>{0, 0.5}};
 
@@ -139,7 +140,7 @@ std::vector<std::vector<double>> threeband_hubbard<point_group_type>::get_a_vect
 }
 
 template <typename point_group_type>
-std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> threeband_hubbard<
+std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> ani3band_hubbard<
     point_group_type>::get_orbital_permutations() {
   static std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> permutations(0);
   return permutations;
@@ -147,7 +148,7 @@ std::vector<std::pair<std::pair<int, int>, std::pair<int, int>>> threeband_hubba
 
 template <typename point_group_type>
 template <typename BandDmn, typename SpinDmn, typename RDmn, typename parameters_type>
-void threeband_hubbard<point_group_type>::initialize_H_interaction(
+void ani3band_hubbard<point_group_type>::initialize_H_interaction(
     func::function<double, func::dmn_variadic<func::dmn_variadic<BandDmn, SpinDmn>,
                                               func::dmn_variadic<BandDmn, SpinDmn>, RDmn>>& H_interaction,
     const parameters_type& parameters) {
@@ -156,31 +157,36 @@ void threeband_hubbard<point_group_type>::initialize_H_interaction(
   if (SpinDmn::dmn_size() != 2)
     throw std::logic_error("Spin domain size must be 2.");
 
-  const int origin = RDmn::parameter_type::origin_index();
+  const std::vector<typename RDmn::parameter_type::element_type>& basis =
+      RDmn::parameter_type::get_basis_vectors();
 
-  const double U_dd = parameters.get_U_dd();  // interaction in d band
-  const double U_pp = parameters.get_U_pp();  // interaction in p bands
+  assert(basis.size() == 2);
 
-  H_interaction = 0.;
+  //std::cout << "\t Set up interaction for three-band model \n";
 
-  for (int i = 0; i < BANDS; i++) {
-    for (int s1 = 0; s1 < 2; s1++) {
-      for (int j = 0; j < BANDS; j++) {
-        for (int s2 = 0; s2 < 2; s2++) {
-          if (i == 0 && j == 0 && s1 != s2)
-            H_interaction(i, s1, j, s2, origin) = U_dd;
+  // For three-band model, there are three different nn and nnn pairs:
+  // (1,0): between (px, py) orbitals in different unit cell. Note not (py,px) orbitals
+  // namely the orbital order is required !!!
+  // (0,1): between (py, px) orbitals in different unit cell
+  // (-1,1): between (py, px) orbitals in different unit cell
+  std::vector<typename RDmn::parameter_type::element_type> nn_vec_Vpp(3);
+  nn_vec_Vpp[0] = basis[0];
+  nn_vec_Vpp[1] = basis[1];
+  nn_vec_Vpp[2] = basis[1];
+  nn_vec_Vpp[2][0] -= basis[1][1];
 
-          if (i == j && i != 0 && s1 != s2)
-            H_interaction(i, s1, j, s2, origin) = U_pp;
-        }
-      }
-    }
-  }
+  // check:
+  //std::cout << "nn_vec_Vpp[0] = " << nn_vec_Vpp[0][0] << "\t" << nn_vec_Vpp[0][1] << "\n";
+  //std::cout << "nn_vec_Vpp[1] = " << nn_vec_Vpp[1][0] << "\t" << nn_vec_Vpp[1][1] << "\n";
+  //std::cout << "nn_vec_Vpp[2] = " << nn_vec_Vpp[2][0] << "\t" << nn_vec_Vpp[2][1] << "\n";
+
+  // basis is for setting Vpd
+  util::initialize3BandHint(parameters, nn_vec_Vpp, basis, H_interaction);
 }
 
 template <typename point_group_type>
 template <class domain>
-void threeband_hubbard<point_group_type>::initialize_H_symmetry(
+void ani3band_hubbard<point_group_type>::initialize_H_symmetry(
     func::function<int, domain>& H_symmetries) {
   H_symmetries = -1;
 
@@ -194,7 +200,7 @@ void threeband_hubbard<point_group_type>::initialize_H_symmetry(
 
 template <typename point_group_type>
 template <typename ParametersType, typename ScalarType, typename BandDmn, typename SpinDmn, typename KDmn>
-void threeband_hubbard<point_group_type>::initialize_H_0(
+void ani3band_hubbard<point_group_type>::initialize_H_0(
     const ParametersType& parameters,
     func::function<ScalarType, func::dmn_variadic<func::dmn_variadic<BandDmn, SpinDmn>,
                                                   func::dmn_variadic<BandDmn, SpinDmn>, KDmn>>& H_0) {
@@ -205,10 +211,12 @@ void threeband_hubbard<point_group_type>::initialize_H_0(
 
   const auto& k_vecs = KDmn::get_elements();
 
-  const auto t_pd = parameters.get_t_pd();
-  const auto t_pp = parameters.get_t_pp();
-  const auto ep_d = parameters.get_ep_d();
-  const auto ep_p = parameters.get_ep_p();
+  const auto t_pdx = parameters.get_t_pdx();
+  const auto t_pdy = parameters.get_t_pdy();
+  const auto t_pp  = parameters.get_t_pp();
+  const auto ep_d  = parameters.get_ep_d();
+  const auto ep_px = parameters.get_ep_px();
+  const auto ep_py = parameters.get_ep_py();
 
   H_0 = ScalarType(0);
 
@@ -216,14 +224,14 @@ void threeband_hubbard<point_group_type>::initialize_H_0(
 
   for (int k_ind = 0; k_ind < KDmn::dmn_size(); ++k_ind) {
     const auto& k = k_vecs[k_ind];
-    const auto valdpx = 2. * I * t_pd * std::sin(k[0] / 2.);
-    const auto valdpy = -2. * I * t_pd * std::sin(k[1] / 2.);
+    const auto valdpx = 2. * I * t_pdx * std::sin(k[0] / 2.);
+    const auto valdpy = -2. * I * t_pdy * std::sin(k[1] / 2.);
     const auto valpxpy = 4. * t_pp * std::sin(k[0] / 2.) * std::sin(k[1] / 2.);
 
     for (int s = 0; s < 2; s++) {
       H_0(0, s, 0, s, k_ind) = ep_d;
-      H_0(1, s, 1, s, k_ind) = ep_p;
-      H_0(2, s, 2, s, k_ind) = ep_p;
+      H_0(1, s, 1, s, k_ind) = ep_px;
+      H_0(2, s, 2, s, k_ind) = ep_py;
 
       H_0(0, s, 1, s, k_ind) = valdpx;
       H_0(1, s, 0, s, k_ind) = -valdpx;
@@ -241,4 +249,4 @@ void threeband_hubbard<point_group_type>::initialize_H_0(
 }  // phys
 }  // dca
 
-#endif  // DCA_PHYS_MODELS_ANALYTIC_HAMILTONIANS_THREEBAND_LATTICE_HPP
+#endif  // DCA_PHYS_MODELS_ANALYTIC_HAMILTONIANS_ANI3BAND_LATTICE_HPP
