@@ -12,7 +12,7 @@
 template <typename PointGroup>
 class ModelParameters<models::TightBindingModel<models::bilayer_eg<PointGroup>>> {
 public:
-  ModelParameters() : e1_(0.), e2_(0.), t1_(0.), t2_(0.), t1_prime_(0.), t2_prime_(0.), t_hyb_(0.), t_hyb_prime_(0.), t_perp1_(0.), t_perp2_(0.), U1_(0.), U2_(0.), V_(0.), V_prime_(0.) {}
+  ModelParameters() : e1_(0.), e2_(0.), t1_(0.), t2_(0.), t1_prime_(0.), t2_prime_(0.), t_hyb_x_(0.), t_hyb_y_(0.), t_perp1_(0.), t_perp2_(0.), U1_(0.), U2_(0.), V_(0.), V_prime_(0.) {}
 
   template <typename Concurrency>
   int getBufferSize(const Concurrency& concurrency) const;
@@ -66,18 +66,18 @@ public:
     t2_prime_ = t2_prime;
   }
   
-  double get_t_hyb() const {
-    return t_hyb_;
+  double get_t_hyb_x() const {
+    return t_hyb_x_;
   }
-  void set_t_hyb(const double t_hyb) {
-    t_hyb_ = t_hyb;
+  void set_t_hyb_x(const double t_hyb_x) {
+    t_hyb_x_ = t_hyb_x;
   }
 
-  double get_t_hyb_prime() const {
-    return t_hyb_prime_;
+  double get_t_hyb_y() const {
+    return t_hyb_y_;
   }
-  void set_t_hyb_prime(const double t_hyb_prime) {
-    t_hyb_prime_ = t_hyb_prime;
+  void set_t_hyb_y(const double t_hyb_y) {
+    t_hyb_y_ = t_hyb_y;
   }
   
   double get_t_perp1() const {
@@ -129,8 +129,8 @@ private:
   double t2_;
   double t1_prime_;
   double t2_prime_;
-  double t_hyb_;
-  double t_hyb_prime_;
+  double t_hyb_x_;
+  double t_hyb_y_;
   double t_perp1_;
   double t_perp2_;
   double U1_;
@@ -151,8 +151,8 @@ int ModelParameters<models::TightBindingModel<models::bilayer_eg<PointGroup>>>::
   buffer_size += concurrency.get_buffer_size(t2_);
   buffer_size += concurrency.get_buffer_size(t1_prime_);
   buffer_size += concurrency.get_buffer_size(t2_prime_);
-  buffer_size += concurrency.get_buffer_size(t_hyb_);
-  buffer_size += concurrency.get_buffer_size(t_hyb_prime_);
+  buffer_size += concurrency.get_buffer_size(t_hyb_x_);
+  buffer_size += concurrency.get_buffer_size(t_hyb_y_);
   buffer_size += concurrency.get_buffer_size(t_perp1_);
   buffer_size += concurrency.get_buffer_size(t_perp2_);
   buffer_size += concurrency.get_buffer_size(U1_);
@@ -173,8 +173,8 @@ void ModelParameters<models::TightBindingModel<models::bilayer_eg<PointGroup>>>:
   concurrency.pack(buffer, buffer_size, position, t2_);
   concurrency.pack(buffer, buffer_size, position, t1_prime_);
   concurrency.pack(buffer, buffer_size, position, t2_prime_);
-  concurrency.pack(buffer, buffer_size, position, t_hyb_);
-  concurrency.pack(buffer, buffer_size, position, t_hyb_prime_);
+  concurrency.pack(buffer, buffer_size, position, t_hyb_x_);
+  concurrency.pack(buffer, buffer_size, position, t_hyb_y_);
   concurrency.pack(buffer, buffer_size, position, t_perp1_);
   concurrency.pack(buffer, buffer_size, position, t_perp2_);
   concurrency.pack(buffer, buffer_size, position, U1_);
@@ -193,8 +193,8 @@ void ModelParameters<models::TightBindingModel<models::bilayer_eg<PointGroup>>>:
   concurrency.unpack(buffer, buffer_size, position, t2_);
   concurrency.unpack(buffer, buffer_size, position, t1_prime_);
   concurrency.unpack(buffer, buffer_size, position, t2_prime_);
-  concurrency.unpack(buffer, buffer_size, position, t_hyb_);
-  concurrency.unpack(buffer, buffer_size, position, t_hyb_prime_);
+  concurrency.unpack(buffer, buffer_size, position, t_hyb_x_);
+  concurrency.unpack(buffer, buffer_size, position, t_hyb_y_);
   concurrency.unpack(buffer, buffer_size, position, t_perp1_);
   concurrency.unpack(buffer, buffer_size, position, t_perp2_);
   concurrency.unpack(buffer, buffer_size, position, U1_);
@@ -241,12 +241,12 @@ void ModelParameters<models::TightBindingModel<models::bilayer_eg<PointGroup>>>:
     catch (const std::exception& r_e) {
     }
     try {
-      reader_or_writer.execute("t-hyb", t_hyb_);
+      reader_or_writer.execute("t-hyb-x", t_hyb_x_);
     }
     catch (const std::exception& r_e) {
     }
     try {
-      reader_or_writer.execute("t-hyb-prime", t_hyb_prime_);
+      reader_or_writer.execute("t-hyb-y", t_hyb_y_);
     }
     catch (const std::exception& r_e) {
     }

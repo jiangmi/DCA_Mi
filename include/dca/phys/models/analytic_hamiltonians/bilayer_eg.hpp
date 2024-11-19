@@ -230,8 +230,8 @@ void bilayer_eg<point_group_type>::initialize_H_0(
   const auto t2_prime = parameters.get_t2_prime();
     
   // intralayer inter-orbital 
-  const auto t_hyb = parameters.get_t_hyb();
-  const auto t_hyb_prime = parameters.get_t_hyb_prime();
+  const auto t_hyb_x = parameters.get_t_hyb_x();
+  const auto t_hyb_y = parameters.get_t_hyb_y();
     
   // interlayer
   const auto t_perp1 = parameters.get_t_perp1();
@@ -250,7 +250,7 @@ void bilayer_eg<point_group_type>::initialize_H_0(
         e2 +2. * t2 * (std::cos(k[0]) + std::cos(k[1])) + 4. * t2_prime * std::cos(k[0]) * std::cos(k[1]);
       
     // intralayer inter-orbital 
-    const auto val3 = t_hyb + 2. * t_hyb_prime * (std::cos(k[0]) + std::cos(k[1]));
+    const auto val3 = 2. * (t_hyb_x * std::cos(k[0]) + t_hyb_y * std::cos(k[1]));
       
     // interlayer for two different orbitals
     const auto val41 = t_perp1;
@@ -265,7 +265,7 @@ void bilayer_eg<point_group_type>::initialize_H_0(
     H_0(3, 0, 3, 0, k_ind) = val2;
     H_0(3, 1, 3, 1, k_ind) = val2;
 
-    // inter-orbital nn hybridization
+    // inter-orbital hybridization
     H_0(0, 0, 1, 0, k_ind) = val3;
     H_0(0, 1, 1, 1, k_ind) = val3;
     H_0(1, 0, 0, 0, k_ind) = val3;
