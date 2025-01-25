@@ -8,7 +8,6 @@
 // Author: Mi Jiang
 //
 // Trilayer lattice 
-// Useful for NdNiO2 accounting for two Nd-s layers sandwiching Ni-d layer
 
 #ifndef DCA_PHYS_MODELS_ANALYTIC_HAMILTONIANS_TRILAYER_LATTICE_HPP
 #define DCA_PHYS_MODELS_ANALYTIC_HAMILTONIANS_TRILAYER_LATTICE_HPP
@@ -222,8 +221,12 @@ void trilayer_lattice<point_group_type>::initialize_H_0(
   const auto t1_prime = parameters.get_t1_prime();
   const auto t2_prime = parameters.get_t2_prime();
   const auto t3_prime = parameters.get_t3_prime();
-  const auto t_perp = parameters.get_t_perp();
-  const auto t_perp_prime = parameters.get_t_perp_prime();
+  const auto t_perp12 = parameters.get_t_perp12();
+  const auto t_perp_prime12 = parameters.get_t_perp_prime12();
+  const auto t_perp23 = parameters.get_t_perp23();
+  const auto t_perp_prime23 = parameters.get_t_perp_prime23();
+  const auto coefp = parameters.get_coefp();
+  const auto coefm = parameters.get_coefm();
 
   H_0 = ScalarType(0);
 
@@ -236,7 +239,9 @@ void trilayer_lattice<point_group_type>::initialize_H_0(
     const auto val3 =
         e3 -2. * t3 * (std::cos(k[0]) + std::cos(k[1])) - 4. * t3_prime * std::cos(k[0]) * std::cos(k[1]);
 
-    const auto val4 = -t_perp -2. * t_perp_prime * (std::cos(k[0]) - std::cos(k[1]));
+    const auto val12 = -t_perp12 -2. * t_perp_prime12 * coefp * (std::cos(k[0]) + std::cos(k[1])) -2. * t_perp_prime12 * coefm * (std::cos(k[0]) - std::cos(k[1]));
+      
+    const auto val23 = -t_perp23 -2. * t_perp_prime23 * coefp * (std::cos(k[0]) + std::cos(k[1])) -2. * t_perp_prime23 * coefm * (std::cos(k[0]) - std::cos(k[1]));
 
     H_0(0, 0, 0, 0, k_ind) = val1;
     H_0(0, 1, 0, 1, k_ind) = val1;
@@ -245,15 +250,15 @@ void trilayer_lattice<point_group_type>::initialize_H_0(
     H_0(2, 0, 2, 0, k_ind) = val3;
     H_0(2, 1, 2, 1, k_ind) = val3;
 
-    H_0(0, 0, 1, 0, k_ind) = val4;
-    H_0(0, 1, 1, 1, k_ind) = val4;
-    H_0(1, 0, 0, 0, k_ind) = val4;
-    H_0(1, 1, 0, 1, k_ind) = val4;
+    H_0(0, 0, 1, 0, k_ind) = val12;
+    H_0(0, 1, 1, 1, k_ind) = val12;
+    H_0(1, 0, 0, 0, k_ind) = val12;
+    H_0(1, 1, 0, 1, k_ind) = val12;
 
-    H_0(1, 0, 2, 0, k_ind) = val4;
-    H_0(1, 1, 2, 1, k_ind) = val4;
-    H_0(2, 0, 1, 0, k_ind) = val4;
-    H_0(2, 1, 1, 1, k_ind) = val4;
+    H_0(1, 0, 2, 0, k_ind) = val23;
+    H_0(1, 1, 2, 1, k_ind) = val23;
+    H_0(2, 0, 1, 0, k_ind) = val23;
+    H_0(2, 1, 1, 1, k_ind) = val23;
   }
 }
 

@@ -12,7 +12,7 @@
 template <typename PointGroup>
 class ModelParameters<models::TightBindingModel<models::trilayer_lattice<PointGroup>>> {
 public:
-  ModelParameters() : e1_(0.), e2_(0.), e3_(0.), t1_(0.), t2_(0.), t3_(0.), t1_prime_(0.), t2_prime_(0.), t3_prime_(0.), t_perp_(0.), t_perp_prime_(0.), U1_(0.), U2_(0.), U3_(0.), V_(0.), V_prime_(0.) {}
+  ModelParameters() : e1_(0.), e2_(0.), e3_(0.), t1_(0.), t2_(0.), t3_(0.), t1_prime_(0.), t2_prime_(0.), t3_prime_(0.), t_perp12_(0.), t_perp_prime12_(0.), t_perp23_(0.), t_perp_prime23_(0.), coefp_(0.), coefm_(0.), U1_(0.), U2_(0.), U3_(0.), V_(0.), V_prime_(0.) {}
 
   template <typename Concurrency>
   int getBufferSize(const Concurrency& concurrency) const;
@@ -87,18 +87,46 @@ public:
     t3_prime_ = t3_prime;
   }
 
-  double get_t_perp() const {
-    return t_perp_;
+  double get_t_perp12() const {
+    return t_perp12_;
   }
-  void set_t_perp(const double t_perp) {
-    t_perp_ = t_perp;
+  void set_t_perp12(const double t_perp12) {
+    t_perp12_ = t_perp12;
   }
 
-  double get_t_perp_prime() const {
-    return t_perp_prime_;
+  double get_t_perp_prime12() const {
+    return t_perp_prime12_;
   }
-  void set_t_perp_prime(const double t_perp_prime) {
-    t_perp_prime_ = t_perp_prime;
+  void set_t_perp_prime12(const double t_perp_prime12) {
+    t_perp_prime12_ = t_perp_prime12;
+  }
+  
+  double get_t_perp23() const {
+    return t_perp23_;
+  }
+  void set_t_perp23(const double t_perp23) {
+    t_perp23_ = t_perp23;
+  }
+
+  double get_t_perp_prime23() const {
+    return t_perp_prime23_;
+  }
+  void set_t_perp_prime23(const double t_perp_prime23) {
+    t_perp_prime23_ = t_perp_prime23;
+  }
+  
+  double get_coefp() const {
+    return coefp_;
+  }
+  void set_coefp(const double coefp) {
+    coefp_ = coefp;
+  }
+
+  double get_coefm() const {
+    return coefm_;
+  }
+  void set_coefm(const double coefm) {
+    coefm_ = coefm;
   }
 
   double get_U1() const {
@@ -146,8 +174,12 @@ private:
   double t1_prime_;
   double t2_prime_;
   double t3_prime_;
-  double t_perp_;
-  double t_perp_prime_;
+  double t_perp12_;
+  double t_perp_prime12_;
+  double t_perp23_;
+  double t_perp_prime23_;
+  double coefp_;
+  double coefm_;
   double U1_;
   double U2_;
   double U3_;
@@ -170,8 +202,12 @@ int ModelParameters<models::TightBindingModel<models::trilayer_lattice<PointGrou
   buffer_size += concurrency.get_buffer_size(t1_prime_);
   buffer_size += concurrency.get_buffer_size(t2_prime_);
   buffer_size += concurrency.get_buffer_size(t3_prime_);
-  buffer_size += concurrency.get_buffer_size(t_perp_);
-  buffer_size += concurrency.get_buffer_size(t_perp_prime_);
+  buffer_size += concurrency.get_buffer_size(t_perp12_);
+  buffer_size += concurrency.get_buffer_size(t_perp_prime12_);
+  buffer_size += concurrency.get_buffer_size(t_perp23_);
+  buffer_size += concurrency.get_buffer_size(t_perp_prime23_);
+  buffer_size += concurrency.get_buffer_size(coefp_);
+  buffer_size += concurrency.get_buffer_size(coefm_);
   buffer_size += concurrency.get_buffer_size(U1_);
   buffer_size += concurrency.get_buffer_size(U2_);
   buffer_size += concurrency.get_buffer_size(U3_);
@@ -194,8 +230,12 @@ void ModelParameters<models::TightBindingModel<models::trilayer_lattice<PointGro
   concurrency.pack(buffer, buffer_size, position, t1_prime_);
   concurrency.pack(buffer, buffer_size, position, t2_prime_);
   concurrency.pack(buffer, buffer_size, position, t3_prime_);
-  concurrency.pack(buffer, buffer_size, position, t_perp_);
-  concurrency.pack(buffer, buffer_size, position, t_perp_prime_);
+  concurrency.pack(buffer, buffer_size, position, t_perp12_);
+  concurrency.pack(buffer, buffer_size, position, t_perp_prime12_);
+  concurrency.pack(buffer, buffer_size, position, t_perp12_);
+  concurrency.pack(buffer, buffer_size, position, t_perp_prime12_);
+  concurrency.pack(buffer, buffer_size, position, coefp_);
+  concurrency.pack(buffer, buffer_size, position, coefm_);
   concurrency.pack(buffer, buffer_size, position, U1_);
   concurrency.pack(buffer, buffer_size, position, U2_);
   concurrency.pack(buffer, buffer_size, position, U3_);
@@ -216,8 +256,12 @@ void ModelParameters<models::TightBindingModel<models::trilayer_lattice<PointGro
   concurrency.unpack(buffer, buffer_size, position, t1_prime_);
   concurrency.unpack(buffer, buffer_size, position, t2_prime_);
   concurrency.unpack(buffer, buffer_size, position, t3_prime_);
-  concurrency.unpack(buffer, buffer_size, position, t_perp_);
-  concurrency.unpack(buffer, buffer_size, position, t_perp_prime_);
+  concurrency.unpack(buffer, buffer_size, position, t_perp12_);
+  concurrency.unpack(buffer, buffer_size, position, t_perp_prime12_);
+  concurrency.unpack(buffer, buffer_size, position, t_perp12_);
+  concurrency.unpack(buffer, buffer_size, position, t_perp_prime12_);
+  concurrency.unpack(buffer, buffer_size, position, coefp_);
+  concurrency.unpack(buffer, buffer_size, position, coefm_);
   concurrency.unpack(buffer, buffer_size, position, U1_);
   concurrency.unpack(buffer, buffer_size, position, U2_);
   concurrency.unpack(buffer, buffer_size, position, U3_);
@@ -278,12 +322,32 @@ void ModelParameters<models::TightBindingModel<models::trilayer_lattice<PointGro
     catch (const std::exception& r_e) {
     }
     try {
-      reader_or_writer.execute("t-perp", t_perp_);
+      reader_or_writer.execute("t-perp12", t_perp12_);
     }
     catch (const std::exception& r_e) {
     }
     try {
-      reader_or_writer.execute("t-perp-prime", t_perp_prime_);
+      reader_or_writer.execute("t-perp-prime12", t_perp_prime12_);
+    }
+    catch (const std::exception& r_e) {
+    }
+    try {
+      reader_or_writer.execute("t-perp23", t_perp23_);
+    }
+    catch (const std::exception& r_e) {
+    }
+    try {
+      reader_or_writer.execute("t-perp-prime23", t_perp_prime23_);
+    }
+    catch (const std::exception& r_e) {
+    }
+    try {
+      reader_or_writer.execute("coefp", coefp_);
+    }
+    catch (const std::exception& r_e) {
+    }
+    try {
+      reader_or_writer.execute("coefm", coefm_);
     }
     catch (const std::exception& r_e) {
     }
