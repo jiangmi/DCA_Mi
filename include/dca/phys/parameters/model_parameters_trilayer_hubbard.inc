@@ -232,8 +232,8 @@ void ModelParameters<models::TightBindingModel<models::trilayer_lattice<PointGro
   concurrency.pack(buffer, buffer_size, position, t3_prime_);
   concurrency.pack(buffer, buffer_size, position, t_perp12_);
   concurrency.pack(buffer, buffer_size, position, t_perp_prime12_);
-  concurrency.pack(buffer, buffer_size, position, t_perp12_);
-  concurrency.pack(buffer, buffer_size, position, t_perp_prime12_);
+  concurrency.pack(buffer, buffer_size, position, t_perp23_);
+  concurrency.pack(buffer, buffer_size, position, t_perp_prime23_);
   concurrency.pack(buffer, buffer_size, position, coefp_);
   concurrency.pack(buffer, buffer_size, position, coefm_);
   concurrency.pack(buffer, buffer_size, position, U1_);
@@ -258,8 +258,8 @@ void ModelParameters<models::TightBindingModel<models::trilayer_lattice<PointGro
   concurrency.unpack(buffer, buffer_size, position, t3_prime_);
   concurrency.unpack(buffer, buffer_size, position, t_perp12_);
   concurrency.unpack(buffer, buffer_size, position, t_perp_prime12_);
-  concurrency.unpack(buffer, buffer_size, position, t_perp12_);
-  concurrency.unpack(buffer, buffer_size, position, t_perp_prime12_);
+  concurrency.unpack(buffer, buffer_size, position, t_perp23_);
+  concurrency.unpack(buffer, buffer_size, position, t_perp_prime23_);
   concurrency.unpack(buffer, buffer_size, position, coefp_);
   concurrency.unpack(buffer, buffer_size, position, coefm_);
   concurrency.unpack(buffer, buffer_size, position, U1_);
