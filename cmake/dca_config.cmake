@@ -69,8 +69,8 @@ endif()
 
 # Lattice type
 set(DCA_LATTICE "square" CACHE STRING
-    "Lattice type, options are: bilayer | trilayer | dsmodel | square | threeband |  ani3band | bilayer_3band | dpsNimodel | ddp_model | triangular | twoband_chain | singleband_chain.")
-set_property(CACHE DCA_LATTICE PROPERTY STRINGS bilayer trilayer dsmodel square threeband ani3band bilayer_3band dpsNimodel ddp_model triangular twoband_chain singleband_chain)
+    "Lattice type, options are: bilayer | trilayer | dsmodel | square | threeband |  ani3band | bilayer_3band | dpsNimodel | dps_model | ddp_model | triangular | twoband_chain | singleband_chain.")
+set_property(CACHE DCA_LATTICE PROPERTY STRINGS bilayer trilayer dsmodel square threeband ani3band bilayer_3band dpsNimodel dps_model ddp_model triangular twoband_chain singleband_chain)
 
 if (DCA_LATTICE STREQUAL "bilayer")
   set(DCA_LATTICE_TYPE dca::phys::models::bilayer_lattice<PointGroup>)
@@ -117,6 +117,11 @@ elseif (DCA_LATTICE STREQUAL "dpsNimodel")
   set(DCA_LATTICE_INCLUDE
     "dca/phys/models/analytic_hamiltonians/dpsNi_model.hpp")
 
+elseif (DCA_LATTICE STREQUAL "dps_model")
+  set(DCA_LATTICE_TYPE dca::phys::models::dps_model<PointGroup>)
+  set(DCA_LATTICE_INCLUDE
+    "dca/phys/models/analytic_hamiltonians/dps_model.hpp")
+    
 elseif (DCA_LATTICE STREQUAL "ddp_model")
   set(DCA_LATTICE_TYPE dca::phys::models::ddp_model<PointGroup>)
   set(DCA_LATTICE_INCLUDE
@@ -133,7 +138,7 @@ elseif (DCA_LATTICE STREQUAL "singleband_chain")
       "dca/phys/models/analytic_hamiltonians/singleband_chain.hpp")
 else()
   message(FATAL_ERROR
-          "Please set DCA_LATTICE to a valid option: bilayer | trilayer | dsmodel | square | threeband | ani3band | bilayer_3band | dpsNimodel | ddp_model | triangular | twoband_chain | singleband_chain.")
+          "Please set DCA_LATTICE to a valid option: bilayer | trilayer | dsmodel | square | threeband | ani3band | bilayer_3band | dpsNimodel | dps_model | ddp_model | triangular | twoband_chain | singleband_chain.")
 endif()
 
 # Model type
