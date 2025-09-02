@@ -223,7 +223,7 @@ void dds_model<point_group_type>::initialize_H_0(
   const auto t2_prime = parameters.get_t2_prime();
   const auto ts_prime = parameters.get_ts_prime();
   const auto txz = parameters.get_txz();
-  const auto tdz2s = parameters.get_t_dz2s();
+  const auto tdz2s = parameters.get_tdz2s();
 
   H_0 = ScalarType(0);
 
