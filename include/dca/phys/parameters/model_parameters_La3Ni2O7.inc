@@ -13,7 +13,7 @@
 template <typename PointGroup>
 class ModelParameters<models::TightBindingModel<models::La3Ni2O7<PointGroup>>> {
 public:
-  ModelParameters() : ex_(0.), ez_(0.), t11x_(0.), t11xy_(0.), t11xx_(0.), t22x_(0.), t22xy_(0.), t22xx_(0.), t12x_(0.), t12xx_(0.), s110_(0.), s11x_(0.), s11xy_(0.), s11xx_(0.), s220_(0.), s22x_(0.), s22xy_(0.), s22xx_(0.), s12x_(0.), s12xx_(0.), Ux_(0.), Uz_(0.), V_(0.), V_prime_(0.) {}
+  ModelParameters() : ex_(0.), ez_(0.), eb_(0.), et_(0.), t11x_(0.), t11xy_(0.), t11xx_(0.), t22x_(0.), t22xy_(0.), t22xx_(0.), t12x_(0.), t12xx_(0.), s110_(0.), s11x_(0.), s11xy_(0.), s11xx_(0.), s220_(0.), s22x_(0.), s22xy_(0.), s22xx_(0.), s12x_(0.), s12xx_(0.), Ux_(0.), Uz_(0.), V_(0.), V_prime_(0.) {}
 
   template <typename Concurrency>
   int getBufferSize(const Concurrency& concurrency) const;
@@ -37,6 +37,20 @@ public:
   }
   void set_ez(const double ez) {
     ez_ = ez;
+  }
+
+   double get_eb() const {
+    return eb_;
+  }
+  void set_eb(const double eb) {
+    eb_ = eb;
+  }
+
+  double get_et() const {
+    return et_;
+  }
+  void set_et(const double et) {
+    et_ = et;
   }
 
   double get_t11x() const {
@@ -196,6 +210,8 @@ public:
 private:
   double ex_;
   double ez_;
+  double eb_;
+  double et_;
   double t11x_;
   double t11xy_;
   double t11xx_;
@@ -228,6 +244,8 @@ int ModelParameters<models::TightBindingModel<models::La3Ni2O7<PointGroup>>>::ge
 
   buffer_size += concurrency.get_buffer_size(ex_);
   buffer_size += concurrency.get_buffer_size(ez_);
+  buffer_size += concurrency.get_buffer_size(eb_);
+  buffer_size += concurrency.get_buffer_size(et_);
   buffer_size += concurrency.get_buffer_size(t11x_);
   buffer_size += concurrency.get_buffer_size(t11xy_);
   buffer_size += concurrency.get_buffer_size(t11xx_);
@@ -260,6 +278,8 @@ void ModelParameters<models::TightBindingModel<models::La3Ni2O7<PointGroup>>>::p
     const Concurrency& concurrency, char* buffer, int buffer_size, int& position) const {
   concurrency.pack(buffer, buffer_size, position, ex_);
   concurrency.pack(buffer, buffer_size, position, ez_);
+  concurrency.pack(buffer, buffer_size, position, eb_);
+  concurrency.pack(buffer, buffer_size, position, et_);
   concurrency.pack(buffer, buffer_size, position, t11x_);
   concurrency.pack(buffer, buffer_size, position, t11xy_);
   concurrency.pack(buffer, buffer_size, position, t11xx_);
@@ -290,6 +310,8 @@ void ModelParameters<models::TightBindingModel<models::La3Ni2O7<PointGroup>>>::u
     const Concurrency& concurrency, char* buffer, int buffer_size, int& position) {
   concurrency.unpack(buffer, buffer_size, position, ex_);
   concurrency.unpack(buffer, buffer_size, position, ez_);
+  concurrency.unpack(buffer, buffer_size, position, eb_);
+  concurrency.unpack(buffer, buffer_size, position, et_);
   concurrency.unpack(buffer, buffer_size, position, t11x_);
   concurrency.unpack(buffer, buffer_size, position, t11xy_);
   concurrency.unpack(buffer, buffer_size, position, t11xx_);
@@ -328,6 +350,16 @@ void ModelParameters<models::TightBindingModel<models::La3Ni2O7<PointGroup>>>::r
     }
     try {
       reader_or_writer.execute("ez", ez_);
+    }
+    catch (const std::exception& r_e) {
+    }
+     try {
+      reader_or_writer.execute("eb", eb_);
+    }
+    catch (const std::exception& r_e) {
+    }
+    try {
+      reader_or_writer.execute("et", et_);
     }
     catch (const std::exception& r_e) {
     }

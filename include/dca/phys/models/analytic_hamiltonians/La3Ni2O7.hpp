@@ -38,6 +38,7 @@ public:
   // Aug.17, 2023 debug
   // for C4-C2 rotational sym breaking cases:
   typedef domains::no_symmetry<2> DCA_point_group;
+  //typedef point_group_type DCA_point_group;
 
   const static ClusterShapeType DCA_cluster_shape = BETT_CLUSTER;
   const static ClusterShapeType LDA_cluster_shape = PARALLELEPIPED;
@@ -129,6 +130,8 @@ std::vector<int> La3Ni2O7<point_group_type>::get_flavors() {
 
   flavors[0] = 0;
   flavors[1] = 1;
+  flavors[2] = 2;
+  flavors[3] = 3;
 
   return flavors;
 }
@@ -227,6 +230,8 @@ void La3Ni2O7<point_group_type>::initialize_H_0(
     
   const auto ex = parameters.get_ex();
   const auto ez = parameters.get_ez();
+  const auto eb = parameters.get_eb();
+  const auto et = parameters.get_et();
     
   // below 1 and 2 denotes dx2 and dz2 orb
   // intralayer intra-orbital and inter-orbital 
@@ -265,9 +270,13 @@ void La3Ni2O7<point_group_type>::initialize_H_0(
     // here directly use DFT parameters (with electron language)
       
     // intralayer
-    const auto Hx = ex + 2.* t11x * (std::cos(k[0]) + std::cos(k[1])) + 4. * t11xy * std::cos(k[0])*std::cos(k[1]) + 2. * t11xx * (std::cos(2.*k[0]) + std::cos(2.*k[1]));
+    const auto Hx0 = ex + eb + 2.* t11x * (std::cos(k[0]) + std::cos(k[1])) + 4. * t11xy * std::cos(k[0])*std::cos(k[1]) + 2. * t11xx * (std::cos(2.*k[0]) + std::cos(2.*k[1]));
       
-    const auto Hz = ez + 2.* t22x * (std::cos(k[0]) + std::cos(k[1])) + 4. * t22xy * std::cos(k[0])*std::cos(k[1]) + 2. * t22xx * (std::cos(2.*k[0]) + std::cos(2.*k[1]));
+    const auto Hz1 = ez + eb + 2.* t22x * (std::cos(k[0]) + std::cos(k[1])) + 4. * t22xy * std::cos(k[0])*std::cos(k[1]) + 2. * t22xx * (std::cos(2.*k[0]) + std::cos(2.*k[1]));
+
+    const auto Hx2 = ex + et + 2.* t11x * (std::cos(k[0]) + std::cos(k[1])) + 4. * t11xy * std::cos(k[0])*std::cos(k[1]) + 2. * t11xx * (std::cos(2.*k[0]) + std::cos(2.*k[1]));
+
+    const auto Hz3 = ez + et + 2.* t22x * (std::cos(k[0]) + std::cos(k[1])) + 4. * t22xy * std::cos(k[0])*std::cos(k[1]) + 2. * t22xx * (std::cos(2.*k[0]) + std::cos(2.*k[1]));
       
     const auto V = 2.* t12x * (std::cos(k[0]) - std::cos(k[1])) + 2. * t12xx * (std::cos(2.*k[0]) - std::cos(2.*k[1]));
       
@@ -281,13 +290,13 @@ void La3Ni2O7<point_group_type>::initialize_H_0(
       
     for (int s = 0; s < 2; s++) {
         // intralayer
-        H_0(0, s, 0, s, k_ind) = Hx;
-        H_0(1, s, 1, s, k_ind) = Hz;
+        H_0(0, s, 0, s, k_ind) = Hx0;
+        H_0(1, s, 1, s, k_ind) = Hz1;
         H_0(0, s, 1, s, k_ind) = V;
         H_0(1, s, 0, s, k_ind) = V;
         
-        H_0(2, s, 2, s, k_ind) = Hx;
-        H_0(3, s, 3, s, k_ind) = Hz;
+        H_0(2, s, 2, s, k_ind) = Hx2;
+        H_0(3, s, 3, s, k_ind) = Hz3;
         H_0(2, s, 3, s, k_ind) = V;
         H_0(3, s, 2, s, k_ind) = V;
         
