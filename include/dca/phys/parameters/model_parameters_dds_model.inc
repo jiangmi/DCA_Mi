@@ -12,7 +12,7 @@
 template <typename PointGroup>
 class ModelParameters<models::TightBindingModel<models::dds_model<PointGroup>>> {
 public:
-  ModelParameters() : e1_(0.), e2_(0.), es_(0.), t1_(0.), t2_(0.), ts_(0.), t1_prime_(0.), t2_prime_(0.), ts_prime_(0.), txz_(0.), tdz2s_(0.), U1_(0.), U2_(0.), V_(0.), V_prime_(0.) {}
+  ModelParameters() : e1_(0.), e2_(0.), es_(0.), t1_(0.), t2_(0.), ts_(0.), t1_prime_(0.), t2_prime_(0.), ts_prime_(0.), txz_(0.), txs_(0.), tdz2s_(0.), U1_(0.), U2_(0.), V_(0.), V_prime_(0.) {}
 
   template <typename Concurrency>
   int getBufferSize(const Concurrency& concurrency) const;
@@ -94,6 +94,13 @@ public:
     txz_ = txz;
   }
 
+  double get_txs() const {
+    return txs_;
+  }
+  void set_txs(const double txs) {
+    txs_ = txs;
+  }
+  
   double get_tdz2s() const {
     return tdz2s_;
   }
@@ -140,6 +147,7 @@ private:
   double t2_prime_;
   double ts_prime_;
   double txz_;
+  double txs_;
   double tdz2s_;
   double U1_;
   double U2_;
@@ -163,6 +171,7 @@ int ModelParameters<models::TightBindingModel<models::dds_model<PointGroup>>>::g
   buffer_size += concurrency.get_buffer_size(t2_prime_);
   buffer_size += concurrency.get_buffer_size(ts_prime_);
   buffer_size += concurrency.get_buffer_size(txz_);
+  buffer_size += concurrency.get_buffer_size(txs_);
   buffer_size += concurrency.get_buffer_size(tdz2s_);
   buffer_size += concurrency.get_buffer_size(U1_);
   buffer_size += concurrency.get_buffer_size(U2_);
@@ -186,6 +195,7 @@ void ModelParameters<models::TightBindingModel<models::dds_model<PointGroup>>>::
   concurrency.pack(buffer, buffer_size, position, t2_prime_);
   concurrency.pack(buffer, buffer_size, position, ts_prime_);
   concurrency.pack(buffer, buffer_size, position, txz_);
+  concurrency.pack(buffer, buffer_size, position, txs_);
   concurrency.pack(buffer, buffer_size, position, tdz2s_);
   concurrency.pack(buffer, buffer_size, position, U1_);
   concurrency.pack(buffer, buffer_size, position, U2_);
@@ -207,6 +217,7 @@ void ModelParameters<models::TightBindingModel<models::dds_model<PointGroup>>>::
   concurrency.unpack(buffer, buffer_size, position, t2_prime_);
   concurrency.unpack(buffer, buffer_size, position, ts_prime_);
   concurrency.unpack(buffer, buffer_size, position, txz_);
+  concurrency.unpack(buffer, buffer_size, position, txs_);
   concurrency.unpack(buffer, buffer_size, position, tdz2s_);
   concurrency.unpack(buffer, buffer_size, position, U1_);
   concurrency.unpack(buffer, buffer_size, position, U2_);
@@ -268,6 +279,11 @@ void ModelParameters<models::TightBindingModel<models::dds_model<PointGroup>>>::
     }
     try {
       reader_or_writer.execute("txz", txz_);
+    }
+    catch (const std::exception& r_e) {
+    }
+    try {
+      reader_or_writer.execute("txs", txs_);
     }
     catch (const std::exception& r_e) {
     }

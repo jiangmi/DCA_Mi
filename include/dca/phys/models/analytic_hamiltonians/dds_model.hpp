@@ -223,6 +223,7 @@ void dds_model<point_group_type>::initialize_H_0(
   const auto t2_prime = parameters.get_t2_prime();
   const auto ts_prime = parameters.get_ts_prime();
   const auto txz = parameters.get_txz();
+  const auto txs = parameters.get_txs();
   const auto tdz2s = parameters.get_tdz2s();
 
   H_0 = ScalarType(0);
@@ -238,8 +239,8 @@ void dds_model<point_group_type>::initialize_H_0(
         es -2. * ts * (std::cos(k[0]) + std::cos(k[1])) - 4. * ts_prime * std::cos(k[0]) * std::cos(k[1]);
       
     const auto val3 = -2. * txz * (std::cos(k[0]) - std::cos(k[1]));
-      
-    const auto val4 = -tdz2s; // only onsite dz2-s hybridization
+    const auto val4 = -2. * txs * (std::cos(k[0]) - std::cos(k[1]));      
+    const auto val5 = -tdz2s; // only onsite dz2-s hybridization
 
     for (int s = 0; s < 2; s++) {
         H_0(0, s, 0, s, k_ind) = val1;
@@ -249,8 +250,11 @@ void dds_model<point_group_type>::initialize_H_0(
         H_0(0, s, 1, s, k_ind) = val3;
         H_0(1, s, 0, s, k_ind) = val3;
         
-        H_0(1, s, 2, s, k_ind) = val4;
-        H_0(2, s, 1, s, k_ind) = val4;
+        H_0(0, s, 2, s, k_ind) = val4;
+        H_0(2, s, 0, s, k_ind) = val4;
+
+        H_0(1, s, 2, s, k_ind) = val5;
+        H_0(2, s, 1, s, k_ind) = val5;
     }
   }
 }
