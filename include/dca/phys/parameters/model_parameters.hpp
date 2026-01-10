@@ -29,6 +29,7 @@
 #include "dca/phys/models/analytic_hamiltonians/bilayer_threeband.hpp"
 #include "dca/phys/models/analytic_hamiltonians/dpsNi_model.hpp"
 #include "dca/phys/models/analytic_hamiltonians/dps_model.hpp"
+#include "dca/phys/models/analytic_hamiltonians/dps_3D_model.hpp"
 #include "dca/phys/models/analytic_hamiltonians/ddp_model.hpp"
 // #include "dca/phys/models/analytic_hamiltonians/fourband_lattice.hpp"
 // #include "dca/phys/models/analytic_hamiltonians/twoband_lattice.hpp"
@@ -73,6 +74,7 @@ class ModelParameters {};
 
 #include "model_parameters_dpsNimodel.inc"
 #include "model_parameters_dps_model.inc"
+#include "model_parameters_dps_3D_model.inc"
 #include "model_parameters_ddp_model.inc"
 
 }  // params
