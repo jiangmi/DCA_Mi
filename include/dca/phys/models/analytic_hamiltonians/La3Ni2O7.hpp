@@ -249,8 +249,8 @@ void La3Ni2O7<point_group_type>::initialize_H_0(
   // interlayer intra-orbital and inter-orbital 
   const auto s110  = parameters.get_s110();
   const auto s11x  = parameters.get_s11x();
-  const auto s11xy = parameters.get_t11xy();
-  const auto s11xx = parameters.get_t11xx();
+  const auto s11xy = parameters.get_s11xy();
+  const auto s11xx = parameters.get_s11xx();
     
   const auto s220  = parameters.get_s220();
   const auto s22x  = parameters.get_s22x();
