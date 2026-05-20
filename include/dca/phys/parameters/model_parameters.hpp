@@ -21,6 +21,7 @@
 
 #include "dca/phys/models/analytic_hamiltonians/bilayer_lattice.hpp"
 #include "dca/phys/models/analytic_hamiltonians/La3Ni2O7.hpp"
+#include "dca/phys/models/analytic_hamiltonians/La4Ni3O10.hpp"
 #include "dca/phys/models/analytic_hamiltonians/bilayer_eg.hpp"
 #include "dca/phys/models/analytic_hamiltonians/trilayer_lattice.hpp"
 #include "dca/phys/models/analytic_hamiltonians/tetralayer_lattice.hpp"
@@ -56,11 +57,13 @@ class ModelParameters {};
 #include "model_parameters_bilayer_hubbard.inc"
 
 #include "model_parameters_La3Ni2O7.inc"
-    
+
 #include "model_parameters_bilayer_eg.inc"
     
 // Specialization for square lattice trilayer Hubbard model
 #include "model_parameters_trilayer_hubbard.inc"
+
+#include "model_parameters_La4Ni3O10.inc"
 
 // Specialization for square lattice tetralayer Hubbard model
 #include "model_parameters_tetralayer_hubbard.inc"
