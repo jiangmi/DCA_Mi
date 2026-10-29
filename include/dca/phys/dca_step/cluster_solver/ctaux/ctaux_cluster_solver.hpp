@@ -30,12 +30,14 @@
 #include "dca/parallel/util/get_workload.hpp"
 #include "dca/phys/dca_step/cluster_solver/ctaux/ctaux_accumulator.hpp"
 #include "dca/phys/dca_step/cluster_solver/ctaux/ctaux_walker.hpp"
+#include "dca/phys/dca_step/cluster_solver/self_energy_mixer.hpp"
 #include "dca/phys/dca_step/symmetrization/symmetrize.hpp"
 #include "dca/phys/domains/cluster/cluster_domain.hpp"
 #include "dca/phys/domains/quantum/electron_band_domain.hpp"
 #include "dca/phys/domains/quantum/electron_spin_domain.hpp"
 #include "dca/phys/domains/time_and_frequency/frequency_domain.hpp"
 #include "dca/phys/four_point_type.hpp"
+#include "dca/phys/parameters/self_energy_mixing_scheme.hpp"
 #include "dca/phys/domains/cluster/cluster_domain_aliases.hpp"
 #include "dca/profiling/events/time.hpp"
 #include "dca/util/print_time.hpp"
@@ -144,6 +146,8 @@ private:
   func::function<std::complex<double>, NuNuKClusterWDmn> Sigma_old_;
   func::function<std::complex<double>, NuNuKClusterWDmn> Sigma_new_;
 
+  SelfEnergyMixer self_energy_mixer_;
+
   double accumulated_sign_;
   func::function<std::complex<double>, NuNuRClusterWDmn> M_r_w_;
   func::function<std::complex<double>, NuNuRClusterWDmn> M_r_w_squared_;
@@ -199,6 +203,11 @@ void CtauxClusterSolver<device_t, Parameters, Data>::initialize(int dca_iteratio
   dca_iteration_ = dca_iteration;
 
   Sigma_old_ = data_.Sigma;
+
+  if (dca_iteration == 0)
+    self_energy_mixer_.reset();
+  self_energy_mixer_.configure(parameters_.get_self_energy_mixing_factor(),
+                               parameters_.get_self_energy_mixing_history_size());
 
   accumulator_.initialize(dca_iteration_);
 
@@ -396,13 +405,21 @@ void CtauxClusterSolver<device_t, Parameters, Data>::computeErrorBars() {
     if (concurrency_.id() == concurrency_.first())
       std::cout << "\n\t\t compute-error-bars on G4\t" << dca::util::print_time() << "\n\n";
 
-    // This creates a copy!
-    auto G4 = accumulator_.get_sign_times_G4();
+    // Normalize and reduce the G4 channels one at a time. Copying the whole set of G4 tensors up
+    // front would duplicate a multi-gigabyte buffer on every rank.
+    // Note: the number and the order of the collective calls must not depend on the rank, which
+    // holds here since G4_local.size() is identical on all ranks.
+    const auto& G4_local = accumulator_.get_sign_times_G4();
+    auto& G4_stddev = data_.get_G4_stdv();
 
-    for (std::size_t channel = 0; channel < G4.size(); ++channel) {
-      G4[channel] /=
-          parameters_.get_beta() * parameters_.get_beta() * accumulator_.get_accumulated_sign();
-      concurrency_.average_and_compute_stddev(G4[channel], data_.get_G4_stdv()[channel]);
+    const double normalization =
+        parameters_.get_beta() * parameters_.get_beta() * accumulator_.get_accumulated_sign();
+
+    for (std::size_t channel = 0; channel < G4_local.size(); ++channel) {
+      // Copy only the channel that is currently being reduced.
+      auto G4_channel = G4_local[channel];
+      G4_channel /= normalization;
+      concurrency_.average_and_compute_stddev(G4_channel, G4_stddev[channel]);
     }
   }
 }
@@ -441,6 +458,8 @@ void CtauxClusterSolver<device_t, Parameters, Data>::collect_measurements() {
       concurrency_.delayedSum(accumulator_.get_G_r_t_stddev());
       concurrency_.delayedSum(accumulator_.get_charge_cluster_moment());
       concurrency_.delayedSum(accumulator_.get_magnetic_cluster_moment());
+      concurrency_.delayedSum(accumulator_.get_densitymatrix_A77());
+      concurrency_.delayedSum(accumulator_.get_densitymatrix_A89());
       concurrency_.delayedSum(accumulator_.get_spin_XX_chi());
       concurrency_.delayedSum(accumulator_.get_spin_ZZ_chi());
       concurrency_.delayedSum(accumulator_.get_charge_chi());
@@ -478,6 +497,8 @@ void CtauxClusterSolver<device_t, Parameters, Data>::collect_measurements() {
     accumulator_.get_G_r_t_stddev() /= accumulated_sign_ * std::sqrt(parameters_.get_measurements());
     accumulator_.get_charge_cluster_moment() /= accumulated_sign_;
     accumulator_.get_magnetic_cluster_moment() /= accumulated_sign_;
+    accumulator_.get_densitymatrix_A77() /= accumulated_sign_;
+    accumulator_.get_densitymatrix_A89() /= accumulated_sign_;
     accumulator_.get_spin_XX_chi() /= accumulated_sign_;
     accumulator_.get_spin_ZZ_chi() /= accumulated_sign_;
     accumulator_.get_charge_chi() /= accumulated_sign_;
@@ -558,7 +579,7 @@ void CtauxClusterSolver<device_t, Parameters, Data>::compute_G_k_w_from_M_r_w() 
 
 template <dca::linalg::DeviceType device_t, class Parameters, class Data>
 double CtauxClusterSolver<device_t, Parameters, Data>::compute_S_k_w_from_G_k_w() {
-  static double alpha = parameters_.get_self_energy_mixing_factor();
+  const double alpha = parameters_.get_self_energy_mixing_factor();
   //     double L2_difference_norm = 0;
   //     double L2_Sigma_norm      = 0;
 
@@ -775,8 +796,34 @@ double CtauxClusterSolver<device_t, Parameters, Data>::mix_self_energy(double al
   symmetrize::execute(data_.Sigma, data_.H_symmetry);
   symmetrize::execute(data_.Sigma_cluster, data_.H_symmetry);
 
-  for (int l = 0; l < data_.Sigma.size(); l++)
-    data_.Sigma(l) = alpha * data_.Sigma(l) + (1. - alpha) * data_.Sigma_cluster(l);
+  if (parameters_.get_self_energy_mixing_scheme() == SelfEnergyMixingScheme::LINEAR) {
+    for (int l = 0; l < data_.Sigma.size(); l++)
+      data_.Sigma(l) = alpha * data_.Sigma(l) + (1. - alpha) * data_.Sigma_cluster(l);
+  }
+  else {
+    // Anderson/Pulay (DIIS) acceleration. data_.Sigma holds Sigma_QMC and data_.Sigma_cluster
+    // holds the input self-energy; the mixer is in-place safe.
+    //
+    // Parallel contract: keep this outside of any rank guard. data_.Sigma and data_.Sigma_cluster
+    // are globally replicated (M_r_w_ and the coarsegraining are reduced with MPI_Allreduce), so
+    // executing the mixer on every rank keeps the replicated histories in sync. Guarding this call
+    // by rank, or skipping it on some ranks, would silently make the ranks diverge.
+    self_energy_mixer_.mix(data_.Sigma.values(), data_.Sigma_cluster.values(),
+                           data_.Sigma.values(), static_cast<int>(data_.Sigma.size()));
+
+    // Report the DIIS coefficients on the first rank only. The mixer itself runs on every rank
+    // (see the parallel contract above), but printing must be rank-guarded.
+    if (concurrency_.id() == concurrency_.first()) {
+      const auto& c = self_energy_mixer_.lastCoefficients();
+      std::cout << "\n\t\t Anderson mixing: m = " << self_energy_mixer_.historySize();
+      if (self_energy_mixer_.lastFellBack())
+        std::cout << " (linear-mixing fallback)";
+      std::cout << ", c = [";
+      for (std::size_t j = 0; j < c.size(); ++j)
+        std::cout << (j == 0 ? "" : ", ") << c[j];
+      std::cout << "]" << std::endl;
+    }
+  }
 
   int offset = std::min(1, w::dmn_size() / 2);
 

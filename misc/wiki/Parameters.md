@@ -217,6 +217,12 @@ Stop the DCA<sup>(+)</sup> loop if this accuracy has been reached.
 `"self-energy-mixing-factor":` double (1.)  
 &Sigma;<sup>(n)</sup> = &alpha; &Sigma;<sup>(n)</sup><sub>QMC</sub> + (1-&alpha;)&Sigma;<sup>(n-1)</sup><sub>coarsegrained</sub>, where &alpha; is the self-energy mixing factor.  
 
+`"mixing-scheme":` string ("LINEAR")  
+Scheme used to mix the cluster self-energy. "LINEAR": standard linear mixing, &Sigma;<sup>(n)</sup> = &alpha; &Sigma;<sup>(n)</sup><sub>QMC</sub> + (1-&alpha;)&Sigma;<sup>(n-1)</sup><sub>coarsegrained</sub>. "ANDERSON": Anderson/Pulay (DIIS) acceleration of the same fixed-point iteration.  
+
+`"mixing-history-size":` integer (8)  
+Number of previous self-energy iterations kept by the Anderson/Pulay mixer. Ignored if "mixing-scheme" is "LINEAR".  
+
 `"interacting-orbitals":` array of integers ([0])  
 Indices of orbitals that are treated interacting.  
 Note that this parameter must be consistent with the model that is used.

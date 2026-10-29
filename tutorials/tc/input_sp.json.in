@@ -2,10 +2,10 @@
     "output": {
         "directory": "./T=CURRENT_TEMP/",
         "output-format": "HDF5",
-        "filename-dca": "dca_sp.hdf5",
+        "filename-dca": "outputname",
         "filename-profiling": "profiling.json",
         "dump-lattice-self-energy": false,
-        "dump-cluster-Greens-functions": false,
+        "dump-cluster-Greens-functions": true,
         "dump-Gamma-lattice": false,
         "dump-chi-0-lattice": false
     },
@@ -13,28 +13,56 @@
     "physics": {
         "beta": BETA,
         "density": DENS,
-        "chemical-potential": 0.,
+        "chemical-potential": 0.0,
         "adjust-chemical-potential": true
     },
 
-    "single-band-Hubbard-model": {
-        "t": 1.,
-        "U": HUBBARDU
+    "La3Ni2O7-model": {
+        "ex"       : exval,
+        "ez"       : ezval,
+        "eb"       : ebval,
+        "et"       : etval,
+        "t11x"     : t11xval,
+        "t11xy"    : t11xyval,
+        "t11xx"    : t11xxval,
+        "t22x"     : t22xval,
+        "t22xy"    : t22xyval,
+        "t22xx"    : t22xxval,
+        "t12x"     : t12xval,
+        "t12xx"    : t12xxval,
+        "s110"     : s110val,
+        "s11x"     : s11xval,
+        "s11xy"    : s11xyval,
+        "s11xx"    : s11xxval,
+        "s220"     : s220val,
+        "s22x"     : s22xval,
+        "s22xy"    : s22xyval,
+        "s22xx"    : s22xxval,
+        "s12x"     : s12xval,
+        "s12xx"    : s12xxval,
+        "Ux"       : Uxval,
+        "Uz"       : Uzval,
+        "V"        : Vval,
+        "V-prime"  : Vpval
     },
 
     "DCA": {
-        "initial-self-energy": "./T=PREVIOUS_TEMP/dca_sp.hdf5",
-        "iterations": ITERS,
-        "accuracy": 0.,
-        "self-energy-mixing-factor": 0.75,
-        "interacting-orbitals": [0],
+        "initial-self-energy": "./T=CURRENT_TEMP/dca_sp.hdf5",
+        "iterations": 1,
+        "accuracy": 0.0,
+        "self-energy-mixing-factor": 1.0,
+        "mixing-scheme": "ANDERSON",
+        "mixing-history-size": 3,
+        "interacting-orbitals": [0,1,2,3],
+
+	"do-finite-size-QMC": false,
 
         "coarse-graining": {
             "k-mesh-recursion": 3,
             "periods": 0,
             "quadrature-rule": 1,
-            "threads": 1,
-            "tail-frequencies": 0
+            "threads": 8,
+            "tail-frequencies": 10
         }
     },
 
@@ -42,37 +70,38 @@
         "real-space-grids": {
             "cluster": [VEC1,
                         VEC2],
-            "sp-host": [[10, 10],
-                        [10,-10]]
+            "sp-host": [[20, 20],
+                        [20,-20]]
         },
 
         "imaginary-time": {
-            "sp-time-intervals": 256
+            "sp-time-intervals": 100,
+            "time-intervals-for-time-measurements": 100
         },
 
         "imaginary-frequency": {
-            "sp-fermionic-frequencies": 256
+            "sp-fermionic-frequencies": 512
         }
     },
 
     "Monte-Carlo-integration": {
         "seed": 985456376,
-        "warm-up-sweeps": 100,
-        "sweeps-per-measurement": 1.,
-        "measurements": 100000,
+        "warm-up-sweeps": NWARM,
+        "sweeps-per-measurement": 4.0,
+        "measurements": NMEAS,
 
         "threaded-solver": {
-            "walkers": 3,
-            "accumulators": 5
+            "walkers": 1,
+            "accumulators": 1
         }
     },
 
     "CT-AUX": {
-        "expansion-parameter-K": 1.,
+        "expansion-parameter-K": Kval,
         "initial-configuration-size": 16,
-        "initial-matrix-size": 16,
-        "max-submatrix-size": 16,
+        "initial-matrix-size": 128,
+        "max-submatrix-size": 64,
         "neglect-Bennett-updates": false,
-        "additional-time-measurements": false
+        "additional-time-measurements": true 
     }
 }

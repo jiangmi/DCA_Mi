@@ -126,6 +126,12 @@ public:
   func::function<double, func::dmn_variadic<b, r_dmn_t>>& get_magnetic_cluster_moment() {
     return equal_time_accumulator_.get_magnetic_cluster_moment();
   }
+  func::function<double, func::dmn_variadic<b, b, r_dmn_t, r_dmn_t>>& get_densitymatrix_A77() {
+    return equal_time_accumulator_.get_densitymatrix_A77();
+  }
+  func::function<double, func::dmn_variadic<b, b, r_dmn_t, r_dmn_t>>& get_densitymatrix_A89() {
+    return equal_time_accumulator_.get_densitymatrix_A89();
+  }
   func::function<double, func::dmn_variadic<b, b, r_dmn_t, t_sp>>& get_spin_XX_chi() {
     return equal_time_accumulator_.get_spin_XX_chi();
   }
@@ -322,6 +328,8 @@ void CtauxAccumulator<device_t, Parameters, Data>::write(Writer& writer) {
 //    writer.execute(get_G_r_t_stddev());
     writer.execute(get_charge_cluster_moment());
     writer.execute(get_magnetic_cluster_moment());
+    writer.execute(get_densitymatrix_A77());
+    writer.execute(get_densitymatrix_A89());
     writer.execute(get_spin_XX_chi());
     writer.execute(get_spin_ZZ_chi());
     writer.execute(get_charge_chi());
@@ -380,8 +388,7 @@ void CtauxAccumulator<device_t, Parameters, Data>::measure() {
 
   accumulate_single_particle_quantities();
 
-  if (DCA_iteration == parameters_.get_dca_iterations() - 1 &&
-      parameters_.additional_time_measurements())
+  if (parameters_.additional_time_measurements())
     accumulate_equal_time_quantities();
 }
 
@@ -492,8 +499,7 @@ void CtauxAccumulator<device_t, Parameters, Data>::sumTo(this_type& other) {
   single_particle_accumulator_obj.sumTo(other.single_particle_accumulator_obj);
 
   // equal time measurements
-  if (DCA_iteration == parameters_.get_dca_iterations() - 1 &&
-      parameters_.additional_time_measurements())
+  if (parameters_.additional_time_measurements())
     equal_time_accumulator_.sumTo(other.equal_time_accumulator_);
 
   // tp-measurements

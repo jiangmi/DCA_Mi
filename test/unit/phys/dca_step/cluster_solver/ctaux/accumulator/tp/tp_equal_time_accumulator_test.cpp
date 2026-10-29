@@ -73,6 +73,8 @@ TEST_F(TpEqualTimeAccumulatorTest, AccumulateAndSum) {
   expect_near(accumulator_sum.get_charge_cluster_moment(), accumulator3.get_charge_cluster_moment());
   expect_near(accumulator_sum.get_magnetic_cluster_moment(),
               accumulator3.get_magnetic_cluster_moment());
+  expect_near(accumulator_sum.get_densitymatrix_A77(),
+              accumulator3.get_densitymatrix_A77());
   expect_near(accumulator_sum.get_dwave_pp_correlator(), accumulator3.get_dwave_pp_correlator());
 }
 

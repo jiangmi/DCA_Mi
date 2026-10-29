@@ -18,6 +18,8 @@
 #include <string>
 #include <vector>
 
+#include "dca/phys/parameters/self_energy_mixing_scheme.hpp"
+
 namespace dca {
 namespace phys {
 namespace params {
@@ -30,6 +32,8 @@ public:
         dca_iterations_(1),
         dca_accuracy_(0.),
         self_energy_mixing_factor_(1.),
+        self_energy_mixing_scheme_(SelfEnergyMixingScheme::LINEAR),
+        self_energy_mixing_history_size_(8),
         interacting_orbitals_{0},
 
         do_finite_size_qmc_(false),
@@ -71,6 +75,12 @@ public:
   }
   double get_self_energy_mixing_factor() const {
     return self_energy_mixing_factor_;
+  }
+  SelfEnergyMixingScheme get_self_energy_mixing_scheme() const {
+    return self_energy_mixing_scheme_;
+  }
+  int get_self_energy_mixing_history_size() const {
+    return self_energy_mixing_history_size_;
   }
   const std::vector<int>& get_interacting_orbitals() const {
     return interacting_orbitals_;
@@ -114,6 +124,8 @@ private:
   int dca_iterations_;
   double dca_accuracy_;
   double self_energy_mixing_factor_;
+  SelfEnergyMixingScheme self_energy_mixing_scheme_;
+  int self_energy_mixing_history_size_;
   std::vector<int> interacting_orbitals_;
 
   bool do_finite_size_qmc_;
@@ -141,6 +153,8 @@ int DcaParameters::getBufferSize(const Concurrency& concurrency) const {
   buffer_size += concurrency.get_buffer_size(dca_iterations_);
   buffer_size += concurrency.get_buffer_size(dca_accuracy_);
   buffer_size += concurrency.get_buffer_size(self_energy_mixing_factor_);
+  buffer_size += concurrency.get_buffer_size(self_energy_mixing_scheme_);
+  buffer_size += concurrency.get_buffer_size(self_energy_mixing_history_size_);
   buffer_size += concurrency.get_buffer_size(interacting_orbitals_);
   buffer_size += concurrency.get_buffer_size(do_finite_size_qmc_);
   buffer_size += concurrency.get_buffer_size(k_mesh_recursion_);
@@ -164,6 +178,8 @@ void DcaParameters::pack(const Concurrency& concurrency, char* buffer, int buffe
   concurrency.pack(buffer, buffer_size, position, dca_iterations_);
   concurrency.pack(buffer, buffer_size, position, dca_accuracy_);
   concurrency.pack(buffer, buffer_size, position, self_energy_mixing_factor_);
+  concurrency.pack(buffer, buffer_size, position, self_energy_mixing_scheme_);
+  concurrency.pack(buffer, buffer_size, position, self_energy_mixing_history_size_);
   concurrency.pack(buffer, buffer_size, position, interacting_orbitals_);
   concurrency.pack(buffer, buffer_size, position, do_finite_size_qmc_);
   concurrency.pack(buffer, buffer_size, position, k_mesh_recursion_);
@@ -185,6 +201,8 @@ void DcaParameters::unpack(const Concurrency& concurrency, char* buffer, int buf
   concurrency.unpack(buffer, buffer_size, position, dca_iterations_);
   concurrency.unpack(buffer, buffer_size, position, dca_accuracy_);
   concurrency.unpack(buffer, buffer_size, position, self_energy_mixing_factor_);
+  concurrency.unpack(buffer, buffer_size, position, self_energy_mixing_scheme_);
+  concurrency.unpack(buffer, buffer_size, position, self_energy_mixing_history_size_);
   concurrency.unpack(buffer, buffer_size, position, interacting_orbitals_);
   concurrency.unpack(buffer, buffer_size, position, do_finite_size_qmc_);
   concurrency.unpack(buffer, buffer_size, position, k_mesh_recursion_);
@@ -216,6 +234,17 @@ void DcaParameters::readWrite(ReaderOrWriter& reader_or_writer) {
     try_to_read("iterations", dca_iterations_);
     try_to_read("accuracy", dca_accuracy_);
     try_to_read("self-energy-mixing-factor", self_energy_mixing_factor_);
+
+    // Read the self-energy mixing scheme.
+    std::string mixing_scheme_str = toString(self_energy_mixing_scheme_);
+    try {
+      reader_or_writer.execute("mixing-scheme", mixing_scheme_str);
+      self_energy_mixing_scheme_ = stringToSelfEnergyMixingScheme(mixing_scheme_str);
+    }
+    catch (const std::exception& r_e) {
+    }
+    try_to_read("mixing-history-size", self_energy_mixing_history_size_);
+
     try_to_read("interacting-orbitals", interacting_orbitals_);
 
     try_to_read("do-finite-size-QMC", do_finite_size_qmc_);
