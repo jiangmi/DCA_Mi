@@ -248,26 +248,32 @@ void La4Ni3O10<point_group_type>::initialize_H_0(
 
   // intralayer intra-orbital
   const auto t1x1x1 = parameters.get_t1x1x1();
-  const auto t2x1x1 = parameters.get_t2x1x1();
+  const auto t2x1x1X = parameters.get_t2x1x1X();
+  const auto t2x1x1Y = parameters.get_t2x1x1Y();
   const auto t3x1x1 = parameters.get_t3x1x1();
   
   const auto t1x2x2 = parameters.get_t1x2x2();
-  const auto t2x2x2 = parameters.get_t2x2x2();
+  const auto t2x2x2X = parameters.get_t2x2x2X();
+  const auto t2x2x2Y = parameters.get_t2x2x2Y();
   const auto t3x2x2 = parameters.get_t3x2x2();
  
   const auto t1z1z1 = parameters.get_t1z1z1();
-  const auto t2z1z1 = parameters.get_t2z1z1();
+  const auto t2z1z1X = parameters.get_t2z1z1X();
+  const auto t2z1z1Y = parameters.get_t2z1z1Y();
   const auto t3z1z1 = parameters.get_t3z1z1();
 
   const auto t1z2z2 = parameters.get_t1z2z2();
-  const auto t2z2z2 = parameters.get_t2z2z2();
+  const auto t2z2z2X = parameters.get_t2z2z2X();
+  const auto t2z2z2Y = parameters.get_t2z2z2Y();
   const auto t3z2z2 = parameters.get_t3z2z2();
     
   // intralayer inter-orbital
-  const auto t1x1z1 = parameters.get_t1x1z1();
+  const auto t1x1z1X = parameters.get_t1x1z1X();
+  const auto t1x1z1Y = parameters.get_t1x1z1Y();
   const auto t2x1z1 = parameters.get_t2x1z1();
 
-  const auto t1x2z2 = parameters.get_t1x2z2();
+  const auto t1x2z2X = parameters.get_t1x2z2X();
+  const auto t1x2z2Y = parameters.get_t1x2z2Y();
   const auto t2x2z2 = parameters.get_t2x2z2();
     
   // interlayer intra-orbital
@@ -308,12 +314,12 @@ void La4Ni3O10<point_group_type>::initialize_H_0(
     // here directly use DFT parameters (with electron language)
       
     // intralayer
-    const auto Hx11 = ex1 + 2.* t1x1x1 * (std::cos(k[0]) + std::cos(k[1])) + 4. * t2x1x1 * std::cos(k[0])*std::cos(k[1]) + 2. * t3x1x1 * (std::cos(2.*k[0]) + std::cos(2.*k[1]));
-    const auto Hz11 = ez1 + 2.* t1z1z1 * (std::cos(k[0]) + std::cos(k[1])) + 4. * t2z1z1 * std::cos(k[0])*std::cos(k[1]) + 2. * t3z1z1 * (std::cos(2.*k[0]) + std::cos(2.*k[1]));
-    const auto Hx22 = ex2 + 2.* t1x2x2 * (std::cos(k[0]) + std::cos(k[1])) + 4. * t2x2x2 * std::cos(k[0])*std::cos(k[1]) + 2. * t3x2x2 * (std::cos(2.*k[0]) + std::cos(2.*k[1]));
-    const auto Hz22 = ez2 + 2.* t1z2z2 * (std::cos(k[0]) + std::cos(k[1])) + 4. * t2z2z2 * std::cos(k[0])*std::cos(k[1]) + 2. * t3z2z2 * (std::cos(2.*k[0]) + std::cos(2.*k[1]));
-    const auto V11 = 2.* t1x1z1 * (std::cos(k[0]) - std::cos(k[1])) + 2. * t2x1z1 * (std::cos(2.*k[0]) - std::cos(2.*k[1]));
-    const auto V22 = 2.* t1x2z2 * (std::cos(k[0]) - std::cos(k[1])) + 2. * t2x2z2 * (std::cos(2.*k[0]) - std::cos(2.*k[1]));
+    const auto Hx11 = ex1 + 2.* t1x1x1 * (std::cos(k[0]) + std::cos(k[1])) + 2.* t2x1x1X * std::cos(k[0] + k[1]) + 2.* t2x1x1Y * std::cos(k[0] - k[1]) + 2.* t3x1x1 * (std::cos(2.*k[0]) + std::cos(2.*k[1]));
+    const auto Hz11 = ez1 + 2.* t1z1z1 * (std::cos(k[0]) + std::cos(k[1])) + 2.* t2z1z1X * std::cos(k[0] + k[1]) + 2.* t2z1z1Y * std::cos(k[0] - k[1]) + 2.* t3z1z1 * (std::cos(2.*k[0]) + std::cos(2.*k[1]));
+    const auto Hx22 = ex2 + 2.* t1x2x2 * (std::cos(k[0]) + std::cos(k[1])) + 2.* t2x2x2X * std::cos(k[0] + k[1]) + 2.* t2x2x2Y * std::cos(k[0] - k[1]) + 2.* t3x2x2 * (std::cos(2.*k[0]) + std::cos(2.*k[1]));
+    const auto Hz22 = ez2 + 2.* t1z2z2 * (std::cos(k[0]) + std::cos(k[1])) + 2.* t2z2z2X * std::cos(k[0] + k[1]) + 2.* t2z2z2Y * std::cos(k[0] - k[1]) + 2.* t3z2z2 * (std::cos(2.*k[0]) + std::cos(2.*k[1]));
+    const auto V11 = 2.* t1x1z1X * std::cos(k[0]) + 2.* t1x1z1Y * std::cos(k[1]) + 2.* t2x1z1 * (std::cos(2.*k[0]) - std::cos(2.*k[1]));
+    const auto V22 = 2.* t1x2z2X * std::cos(k[0]) + 2.* t1x2z2Y * std::cos(k[1]) + 2.* t2x2z2 * (std::cos(2.*k[0]) - std::cos(2.*k[1]));
 
     // interlayer
     const auto Hxp12 = s0x1x2 + 2.* s1x1x2 * (std::cos(k[0]) + std::cos(k[1])) + 4. * s2x1x2 * std::cos(k[0])*std::cos(k[1]) + 2. * s3x1x2 * (std::cos(2.*k[0]) + std::cos(2.*k[1]));
